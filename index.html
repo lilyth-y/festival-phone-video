@@ -326,34 +326,34 @@
       <p class="aside">사진은 이 폰 안에만 있습니다. 소리 없는 세로 영상이고, 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다.</p>
     </div>
     <div id="player" class="player">
-      <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-faces.mp4?v=20261027g"></video>
+      <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-faces.mp4?v=20261027h"></video>
       <canvas id="stage" width="720" height="1560"></canvas>
     </div>
     <fieldset class="shelf">
       <legend>모습</legend>
       <label class="on">
         <input type="radio" name="look" value="cube" checked>
-        <span class="frame"><img alt="" src="template-previews/cube-poster.jpg?v=20261027g"></span>
+        <span class="frame"><img alt="" src="template-previews/cube-poster.jpg?v=20261027h"></span>
         <strong>큐브</strong><em>가까운 큐브가 한 번 돌아 다음 얼굴을 보여 줍니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="cards">
-        <span class="frame"><img alt="" src="template-previews/stand-poster.jpg?v=20261027g"></span>
+        <span class="frame"><img alt="" src="template-previews/stand-poster.jpg?v=20261027h"></span>
         <strong>세운 카드</strong><em>두 얼굴이 나란히 선 뒤 새 카드가 앞을 차지합니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="pile">
-        <span class="frame"><img alt="" src="template-previews/pile-poster.jpg?v=20261027g"></span>
+        <span class="frame"><img alt="" src="template-previews/pile-poster.jpg?v=20261027h"></span>
         <strong>포개기</strong><em>다음 인화가 위에서 떨어져 겹칩니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="flip">
-        <span class="frame"><img alt="" src="template-previews/flip-poster.jpg?v=20261027g"></span>
+        <span class="frame"><img alt="" src="template-previews/flip-poster.jpg?v=20261027h"></span>
         <strong>뒤집기</strong><em>큰 카드가 돌려져 다음 얼굴을 보여 줍니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="fan">
-        <span class="frame"><img alt="" src="template-previews/fan-poster.jpg?v=20261027g"></span>
+        <span class="frame"><img alt="" src="template-previews/fan-poster.jpg?v=20261027h"></span>
         <strong>붙여 오르기</strong><em>카드가 올라오며 여러 얼굴이 펼쳐집니다.</em>
       </label>
     </fieldset>
@@ -854,7 +854,7 @@
       if (bg === "#0D1928") {
         return { wall0: "#2A435C", wall1: "#0D1928", floor0: "#0E1824", floor1: "#1B2E44", line: "#3D5670", mat: "#1A2C40", edge: "#24384C" };
       }
-      return { wall0: "#6E6256", wall1: "#171410", floor0: "#12100E", floor1: "#4A3E32", line: "#8A7560", mat: "#3A332C", edge: "#5C5146" };
+      return { wall0: "#000000", wall1: "#000000", floor0: "#000000", floor1: "#161616", line: "#2A2A2A", mat: "#141414", edge: "#3A3A3A" };
     }
 
     var printCache = typeof WeakMap === "function" ? new WeakMap() : null;
@@ -955,28 +955,56 @@
 
     function particle(i, kind, t, bg) {
       var dust = kind !== "lights";
-      var count = kind === "off" ? 0 : dust ? 8 : 6;
+      var count = kind === "off" ? 0 : dust ? 16 : 7;
       if (i >= count) return null;
-      var y = 20 + unit(i, 1) * 170 + Math.sin(t * 0.4 + i) * 6;
-      var x = 30 + unit(i, 3) * (W - 60);
+      var near = dust ? i < 5 : i < 2;
       var ivory = bg === "#F4EFE6";
-      return {
-        x: x,
-        y: y,
-        r: dust ? 1.8 + unit(i, 4) * 2.2 : 9 + unit(i, 4) * 11,
-        a: dust ? 0.24 + unit(i, 5) * 0.28 : 0.16 + unit(i, 5) * 0.18,
-        rgb: dust ? (ivory ? "90,78,66" : "236,230,220") : (ivory ? "176,118,46" : "255,214,150")
-      };
+      var navy = bg === "#0D1928";
+      var drift = near ? (dust ? 22 : 14) : (dust ? 5 : 3);
+      var x0 = near
+        ? (i % 2 === 0 ? 36 + unit(i, 3) * 110 : W - 146 + unit(i, 3) * 100)
+        : 20 + unit(i, 3) * (W - 40);
+      var y0 = near
+        ? 70 + unit(i, 1) * 980
+        : 30 + unit(i, 1) * (H - 80);
+      var speed = near ? (dust ? 0.32 : 0.4) : (dust ? 0.08 : 0.1);
+      var x = x0 + Math.sin(t * speed + i * 1.7) * drift;
+      var y = y0 + Math.cos(t * speed * 0.7 + i) * drift * 0.35;
+      var cam = Math.sin(t * 0.55) * 36;
+      x += cam * (near ? 1 : 0.18);
+      if (x < -20) x += W;
+      if (x > W + 20) x -= W;
+      var r = near
+        ? (dust ? 16 + unit(i, 4) * 12 : 26 + unit(i, 4) * 14)
+        : (dust ? 1.3 + unit(i, 4) * 1.3 : 6 + unit(i, 4) * 4);
+      var a = near
+        ? (dust ? 0.55 + unit(i, 5) * 0.25 : 0.7)
+        : (dust ? 0.1 + unit(i, 5) * 0.1 : 0.28);
+      var rgb = dust
+        ? (ivory ? (near ? "70,58,46" : "150,138,122") : navy ? (near ? "214,224,232" : "120,140,158") : (near ? "255,246,236" : "150,150,150"))
+        : (ivory ? "150,96,42" : navy ? "232,220,196" : "255,214,160");
+      var z = near ? -1.2 - unit(i, 9) * 0.55 : 1.25 + unit(i, 9) * 1.35;
+      var wx = near
+        ? (i % 2 === 0 ? -1.05 : 1.05) + (unit(i, 3) - 0.5) * 0.3
+        : (unit(i, 3) - 0.5) * 3.8;
+      var wy = near
+        ? 0.85 + unit(i, 1) * 0.7
+        : (unit(i, 1) - 0.35) * 3.1;
+      wx += Math.sin(t * speed + i) * (near ? 0.16 : 0.04);
+      wy += Math.cos(t * speed * 0.8 + i) * (near ? 0.08 : 0.02);
+      return { x: x, y: y, r: r, a: a, rgb: rgb, near: near, z: z, wx: wx, wy: wy };
     }
 
-    function drawParticles(ctx, kind, t, bg) {
+    function drawParticles(ctx, kind, t, bg, layer) {
       if (kind === "off") return;
       var i;
       for (i = 0; i < 18; i += 1) {
         var p = particle(i, kind, t, bg);
         if (!p) break;
+        if (layer === "near" && !p.near) continue;
+        if (layer === "far" && p.near) continue;
         ctx.beginPath();
-        if (kind === "lights") {
+        if (kind === "lights" || p.near) {
           var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
           g.addColorStop(0, "rgba(" + p.rgb + "," + p.a + ")");
           g.addColorStop(1, "rgba(" + p.rgb + ",0)");
@@ -1454,12 +1482,26 @@
       glow.addColorStop(1, "rgba(255,255,255,0)");
       cg.fillStyle = glow;
       cg.fillRect(0, 0, 64, 64);
-      var sprites = new B.SpriteManager("motes", circle.toDataURL("image/png"), 18, 64, scene);
-      sprites.isPickable = false;
+      var spriteUrl = circle.toDataURL("image/png");
+      var farMgr = new B.SpriteManager("farMotes", spriteUrl, 14, 64, scene);
+      var nearMgr = new B.SpriteManager("nearMotes", spriteUrl, 6, 64, scene);
+      farMgr.isPickable = false;
+      nearMgr.isPickable = false;
+      farMgr.renderingGroupId = 1;
+      nearMgr.renderingGroupId = 3;
+      wall.renderingGroupId = 0;
+      floor.renderingGroupId = 0;
+      trim.renderingGroupId = 0;
+      cardA.mesh.renderingGroupId = 2;
+      cardB.mesh.renderingGroupId = 2;
+      shadeA.renderingGroupId = 2;
+      shadeB.renderingGroupId = 2;
       var motes = [];
       for (f = 0; f < 18; f += 1) {
-        var mote = new B.Sprite("mote" + f, sprites);
+        var nearSprite = f < 5;
+        var mote = new B.Sprite("mote" + f, nearSprite ? nearMgr : farMgr);
         mote.isPickable = false;
+        mote.near = nearSprite;
         motes.push(mote);
       }
       var frontZ = face.faceW / 2 + 0.02;
@@ -1566,6 +1608,8 @@
       var tone = roomTones(bg);
       cubeState.wallMat.albedoTexture = gradientTex(tone.wall0, tone.wall1);
       cubeState.floorMat.albedoTexture = gradientTex(tone.floor0, tone.floor1);
+      var line = hexColor(tone.line);
+      cubeState.trimMat.diffuseColor = new BABYLON.Color3(line.r, line.g, line.b);
       cubeState.scene.clearColor = hexColor(tone.wall1);
       cubeState.roomKey = bg;
     }
@@ -1582,23 +1626,102 @@
       mat.albedoColor = new BABYLON.Color3(1, 1, 1);
     }
 
+    function moteSpots() {
+      return [
+        [-0.78, 0.72, 0.08, true],
+        [0.46, 0.34, 0.12, true],
+        [-0.82, -0.35, 0.05, true],
+        [0.68, -0.55, 0.2, true],
+        [0.42, 0.78, 0.1, true],
+        [-0.55, 0.88, 0.72, false],
+        [0.15, 0.92, 0.9, false],
+        [0.62, 0.84, 0.8, false],
+        [-0.88, 0.45, 0.66, false],
+        [0.9, 0.4, 0.84, false],
+        [-0.2, 0.78, 0.58, false],
+        [0.4, 0.7, 0.95, false],
+        [-0.7, -0.72, 0.76, false],
+        [0.55, -0.8, 0.7, false],
+        [-0.35, 0.55, 0.88, false],
+        [0.82, -0.42, 0.62, false]
+      ];
+    }
+
+    function anchorMotes() {
+      if (cubeState.anchors && cubeState.anchors[0].size > 0.02) return;
+      var pose = shotPose(0);
+      var n = Math.cos(pose.alpha);
+      var rs = Math.sin(pose.alpha);
+      var cb = Math.cos(pose.beta);
+      var sb = Math.sin(pose.beta);
+      var cx = pose.tx + pose.radius * n * sb;
+      var cy = pose.ty + pose.radius * cb;
+      var cz = pose.tz + pose.radius * rs * sb;
+      var fx = pose.tx - cx;
+      var fy = pose.ty - cy;
+      var fz = pose.tz - cz;
+      var fl = Math.hypot(fx, fy, fz) || 1;
+      fx /= fl; fy /= fl; fz /= fl;
+      var rx = fz;
+      var ry = 0;
+      var rz = -fx;
+      var rl = Math.hypot(rx, ry, rz) || 1;
+      rx /= rl; ry /= rl; rz /= rl;
+      var ux = ry * fz - rz * fy;
+      var uy = rz * fx - rx * fz;
+      var uz = rx * fy - ry * fx;
+      var tan = Math.tan(CUBE.fov / 2);
+      var aspect = W / H;
+      cubeState.anchors = moteSpots().map(function (sp) {
+        var dist = sp[3] ? 1.05 + sp[2] * 1.4 : 6.4 + sp[2] * 1.5;
+        var px = sp[3] ? 96 : 26;
+        var vis = 2 * dist * tan;
+        var ox = sp[0] * dist * tan * aspect;
+        var oy = -sp[1] * dist * tan;
+        return {
+          x: cx + fx * dist + rx * ox + ux * oy,
+          y: cy + fy * dist + ry * ox + uy * oy,
+          z: cz + fz * dist + rz * ox + uz * oy,
+          near: sp[3],
+          size: (px / H) * vis
+        };
+      });
+    }
+
     function placeMotes(kind, t, bg) {
+      anchorMotes();
+      var ivory = bg === "#F4EFE6";
+      var navy = bg === "#0D1928";
+      var lights = kind === "lights";
+      var off = kind === "off";
+      var rgb = lights
+        ? (ivory ? [0.62, 0.4, 0.18] : navy ? [0.9, 0.86, 0.76] : [1, 0.86, 0.64])
+        : (ivory ? [0.32, 0.26, 0.2] : navy ? [0.78, 0.84, 0.9] : [1, 0.96, 0.92]);
+      var farRgb = lights
+        ? (ivory ? [0.45, 0.32, 0.16] : navy ? [0.55, 0.62, 0.7] : [0.72, 0.68, 0.58])
+        : (ivory ? [0.48, 0.42, 0.36] : navy ? [0.42, 0.5, 0.58] : [0.45, 0.45, 0.45]);
       var i;
       for (i = 0; i < cubeState.motes.length; i += 1) {
         var mote = cubeState.motes[i];
-        var p = particle(i, kind, t, bg);
-        if (!p) {
+        var a = cubeState.anchors[i];
+        var useNear = lights ? i < 2 : i < 5;
+        var useFar = lights ? i >= 5 && i < 11 : i >= 5 && i < 16;
+        if (!a || off || (mote.near && !useNear) || (!mote.near && !useFar)) {
           mote.isVisible = false;
           continue;
         }
+        var speed = a.near ? 0.42 : 0.08;
+        var amp = a.near ? 0.07 : 0.016;
         mote.isVisible = true;
-        mote.position.x = (p.x / W - 0.5) * 3.2;
-        mote.position.y = 1.55 + (1 - p.y / 220) * 0.7;
-        mote.position.z = 1.7;
-        mote.width = 0.035 + (p.r / 20) * 0.05;
+        mote.position.x = a.x + Math.sin(t * speed + i * 1.4) * amp;
+        mote.position.y = a.y + Math.cos(t * speed * 0.75 + i) * amp * 0.55;
+        mote.position.z = a.z;
+        var scale = lights ? (a.near ? 1.45 : 1.6) : 1;
+        mote.width = a.size * scale;
         mote.height = mote.width;
-        var parts = p.rgb.split(",");
-        mote.color = new BABYLON.Color4(Number(parts[0]) / 255, Number(parts[1]) / 255, Number(parts[2]) / 255, p.a * 0.7);
+        var c = a.near ? rgb : farRgb;
+        var alpha = a.near ? (lights ? 0.78 : 0.72) : (lights ? 0.42 : 0.32);
+        mote.color = new BABYLON.Color4(c[0], c[1], c[2], alpha);
       }
     }
 
@@ -1719,12 +1842,13 @@
       var time = t;
       if (!who && t > body) time = body;
       paintRoom(ctx, bg);
-      drawParticles(ctx, kind, time, bg);
+      drawParticles(ctx, kind, time, bg, "far");
       paintMat(ctx, roomTones(bg), rearImage(look, images, time));
       if (look === "pile") drawPile(ctx, images, time);
       else if (look === "flip") drawFlip(ctx, images, time);
       else if (look === "fan") drawFan(ctx, images, time);
       else drawStand(ctx, images, time);
+      drawParticles(ctx, kind, time, bg, "near");
     }
 
     var mboxMotion = {
@@ -1767,11 +1891,11 @@
       var userImages = null;
       var facesReady = false;
       var CLIPS = {
-        cards: "template-previews/stand-faces.mp4?v=20261027g",
-        pile: "template-previews/pile-faces.mp4?v=20261027g",
-        flip: "template-previews/flip-faces.mp4?v=20261027g",
-        fan: "template-previews/fan-faces.mp4?v=20261027g",
-        cube: "template-previews/cube-faces.mp4?v=20261027g"
+        cards: "template-previews/stand-faces.mp4?v=20261027h",
+        pile: "template-previews/pile-faces.mp4?v=20261027h",
+        flip: "template-previews/flip-faces.mp4?v=20261027h",
+        fan: "template-previews/fan-faces.mp4?v=20261027h",
+        cube: "template-previews/cube-faces.mp4?v=20261027h"
       };
 
       function setStatus(text) { note.textContent = text; }
@@ -2006,6 +2130,18 @@
       }
 
       mboxMotion.pause = function () { tick += 1; };
+      mboxMotion.moteReport = function () {
+        if (!cubeState || !cubeState.anchors) return [];
+        var cam = cubeState.scene.activeCamera;
+        var vw = cubeState.engine.getRenderWidth();
+        var vh = cubeState.engine.getRenderHeight();
+        var transform = cubeState.scene.getTransformMatrix();
+        var vp = cam.viewport.toGlobal(vw, vh);
+        return cubeState.motes.slice(0, 16).map(function (m, i) {
+          var p = BABYLON.Vector3.Project(m.position, BABYLON.Matrix.Identity(), transform, vp);
+          return { i: i, on: m.isVisible, near: !!m.near, w: Math.round(m.width * 1000) / 1000, sx: Math.round(p.x), sy: Math.round(p.y) };
+        });
+      };
       mboxMotion.bakeFrame = function (look, t) {
         var images = previewImages(look);
         drawAt(ctx, images, look, "", t);
