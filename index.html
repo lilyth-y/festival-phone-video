@@ -294,24 +294,14 @@
     <fieldset class="shelf">
       <legend>모습</legend>
       <label class="on">
-        <input type="radio" name="look" value="still" checked>
-        <span><strong>잔잔</strong><em>사진이 천천히 겹칩니다.</em></span>
-        <video muted loop playsinline autoplay preload="auto" src="template-previews/still.mp4"></video>
+        <input type="radio" name="look" value="cards" checked>
+        <span><strong>세운 카드</strong><em>가운데 카드가 돌고, 옆 카드가 섭니다.</em></span>
+        <video muted loop playsinline autoplay preload="auto" src="template-previews/cards.mp4"></video>
       </label>
       <label>
-        <input type="radio" name="look" value="turn">
-        <span><strong>넘기기</strong><em>다음 장면이 옆으로 들어옵니다.</em></span>
-        <video muted loop playsinline autoplay preload="auto" src="template-previews/turn.mp4"></video>
-      </label>
-      <label>
-        <input type="radio" name="look" value="warm">
-        <span><strong>불빛</strong><em>같은 움직임에 따뜻한 색만 올립니다.</em></span>
-        <video muted loop playsinline autoplay preload="auto" src="template-previews/warm.mp4"></video>
-      </label>
-      <label>
-        <input type="radio" name="look" value="sweep">
-        <span><strong>빛줄기</strong><em>사진 위를 빛이 한 번 지나갑니다.</em></span>
-        <video muted loop playsinline autoplay preload="auto" src="template-previews/sweep.mp4"></video>
+        <input type="radio" name="look" value="pile">
+        <span><strong>포개기</strong><em>흰 테 사진이 기울어 겹칩니다.</em></span>
+        <video muted loop playsinline autoplay preload="auto" src="template-previews/pile.mp4"></video>
       </label>
     </fieldset>
     <p class="cap">예시 영상 · 손님 사진 아님</p>
@@ -334,12 +324,13 @@
   </main>
   <canvas id="stage" width="720" height="1280"></canvas>
   <script>
-    var HOLD = 1.6;
-    var SLIDE = 0.35;
+    var HERO = 1.5;
+    var MOVE = 0.7;
+    var ONE = 3.0;
     var W = 720;
     var H = 1280;
-    var BAND = 220;
     var END = 1.6;
+    var CARD_ANGLES = [-12, 8, -6, 10, -4, 7];
 
     function cardLine(raw) {
       var text = String(raw == null ? "" : raw).split(/\s+/).join(" ").trim();
@@ -366,49 +357,47 @@
     }
 
     function bodySeconds(n) {
-      if (n <= 1) return HOLD;
-      return HOLD * n + SLIDE * (n - 1);
+      if (n <= 1) return ONE;
+      return HERO * n + MOVE * (n - 1);
     }
 
-    function pairAt(n, t) {
-      var dur = bodySeconds(n);
-      var clip = n > 1 ? HOLD + SLIDE : HOLD;
-      if (n < 1) return { a: 0, b: -1, p: 0, la: 0, lb: 0, clip: clip };
-      if (t < 0) t = 0;
-      if (t > dur) t = dur;
-      if (n > 1) {
-        var k;
-        for (k = 1; k < n; k += 1) {
-          var start = k * HOLD;
-          if (t + 1e-6 >= start && t < start + SLIDE - 1e-6) {
-            return {
-              a: k - 1,
-              b: k,
-              p: (t - start) / SLIDE,
-              la: t - (k - 1) * HOLD,
-              lb: t - start,
-              clip: clip
-            };
-          }
-        }
-      }
-      var i = n === 1 ? 0 : Math.min(n - 1, Math.floor(t / HOLD));
-      return { a: i, b: -1, p: 0, la: t - i * HOLD, lb: 0, clip: clip };
+    function ease(p) {
+      var u = Math.max(0, Math.min(1, p));
+      return u * u * (3 - 2 * u);
     }
 
-    function zoomAt(local, clip) {
-      var u = clip <= 0 ? 0 : Math.max(0, Math.min(1, local / clip));
-      return 1 + 0.045 * u;
+    function stepAt(n, t) {
+      if (n < 1) return { i: 0, next: -1, p: 0 };
+      if (n === 1) return { i: 0, next: -1, p: 0 };
+      var slot = HERO + MOVE;
+      var idx = Math.floor(Math.max(0, t) / slot);
+      if (idx >= n - 1) return { i: n - 1, next: -1, p: 0 };
+      var local = t - idx * slot;
+      if (local <= HERO) return { i: idx, next: -1, p: 0 };
+      return { i: idx, next: idx + 1, p: (local - HERO) / MOVE };
     }
 
-    function sweepX(t, duration) {
-      var u = duration <= 0 ? 0 : Math.max(0, Math.min(1, t / duration));
-      return -BAND + u * (W + BAND);
+    function coverInto(img, dw, dh) {
+      var scale = Math.max(dw / img.width, dh / img.height);
+      var sw = dw / scale;
+      var sh = dh / scale;
+      return {
+        sx: (img.width - sw) / 2,
+        sy: (img.height - sh) / 2,
+        sw: sw,
+        sh: sh
+      };
     }
 
-    function bandAlpha(x) {
-      var mid = BAND / 2;
-      return Math.floor(88 * (1 - Math.abs(x - mid) / mid));
+    function traceRound(c, x, y, w, h, r) {
+      var rr = Math.max(0, Math.min(r, w / 2, h / 2));
+      c.beginPath();
+      c.moveTo(x + rr, y);
+      c.arcTo(x + w, y, x + w, y + h, rr);
+      c.arcTo(x + w, y + h, x, y + h, rr);
+      c.arcTo(x, y + h, x, y, rr);
+      c.arcTo(x, y, x + w, y, rr);
+      c.closePath();
     }
 
     if (typeof document !== "undefined") {
@@ -434,7 +423,7 @@
       function setStatus(text) { note.textContent = text; }
 
       function pickedLook() {
-        var picked = "still";
+        var picked = "cards";
         var i;
         for (i = 0; i < looks.length; i += 1) {
           if (looks[i].checked) picked = looks[i].value;
@@ -464,40 +453,104 @@
         return "";
       }
 
-      function paintPhoto(img, local, clip, warm) {
-        var z = zoomAt(local, clip);
-        var scale = Math.max(W / img.width, H / img.height) * z;
-        var dw = img.width * scale;
-        var dh = img.height * scale;
+      function prepareCard(img) {
+        var cw = W * 0.72;
+        var ch = H * 0.78;
+        var x = (W - cw) / 2;
+        var y = (H - ch) / 2;
+        var src = coverInto(img, cw, ch);
         lctx.setTransform(1, 0, 0, 1, 0, 0);
         lctx.clearRect(0, 0, W, H);
-        lctx.filter = warm ? "saturate(1.12) contrast(1.05)" : "none";
-        lctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
-        lctx.filter = "none";
-        if (warm) {
-          lctx.globalCompositeOperation = "soft-light";
-          lctx.fillStyle = "rgba(255, 170, 90, 0.42)";
-          lctx.fillRect(0, 0, W, H);
-          lctx.globalCompositeOperation = "source-over";
+        lctx.save();
+        traceRound(lctx, x, y, cw, ch, cw * 0.06);
+        lctx.clip();
+        lctx.drawImage(img, src.sx, src.sy, src.sw, src.sh, x, y, cw, ch);
+        lctx.restore();
+        return { x: x, y: y, w: cw, h: ch };
+      }
+
+      function blitYaw(card, yaw) {
+        var rad = yaw * Math.PI / 180;
+        var c = Math.cos(rad);
+        var destW = card.w * Math.max(0.16, Math.abs(c));
+        var cx = W * 0.5 + Math.sin(rad) * W * 0.36;
+        var destX = cx - destW / 2;
+        var strips = 36;
+        var s;
+        ctx.save();
+        ctx.shadowColor = "rgba(0,0,0,0.45)";
+        ctx.shadowBlur = 22;
+        ctx.fillStyle = "#0D1928";
+        ctx.fillRect(destX, card.y, destW, card.h);
+        ctx.restore();
+        for (s = 0; s < strips; s += 1) {
+          var u0 = s / strips;
+          var edge = Math.abs(u0 - 0.5) * 2;
+          var pinch = (1 - Math.abs(c)) * card.h * 0.1 * edge;
+          var sx = card.x + u0 * card.w;
+          var sw = card.w / strips + 0.5;
+          var dx = destX + u0 * destW;
+          var dw = destW / strips + 0.8;
+          ctx.drawImage(layer, sx, card.y, sw, card.h, dx, card.y + pinch, dw, card.h - pinch * 2);
         }
       }
 
-      function blit(dx, alpha) {
+      function drawCards(images, step) {
+        ctx.fillStyle = "#0D1928";
+        ctx.fillRect(0, 0, W, H);
+        var focus = step.i + (step.next >= 0 ? ease(step.p) : 0);
+        var order = [];
+        var a;
+        for (a = 0; a < images.length; a += 1) {
+          var rel = a - focus;
+          if (Math.abs(rel) > 1.25) continue;
+          order.push({ a: a, rel: rel, depth: Math.abs(rel) });
+        }
+        order.sort(function (u, v) { return v.depth - u.depth; });
+        for (a = 0; a < order.length; a += 1) {
+          var yaw = Math.max(-78, Math.min(78, order[a].rel * 62));
+          var card = prepareCard(images[order[a].a]);
+          blitYaw(card, yaw);
+        }
+      }
+
+      function drawPrint(img, angleDeg, slide, index) {
+        var cw = W * 0.74;
+        var ch = H * 0.5;
+        var pad = 16;
+        var src = coverInto(img, cw - pad * 2, ch - pad * 2);
+        lctx.setTransform(1, 0, 0, 1, 0, 0);
+        lctx.clearRect(0, 0, W, H);
+        lctx.fillStyle = "#FFFFFF";
+        traceRound(lctx, 0, 0, cw, ch, 8);
+        lctx.fill();
+        lctx.save();
+        traceRound(lctx, pad, pad, cw - pad * 2, ch - pad * 2, 4);
+        lctx.clip();
+        lctx.drawImage(img, src.sx, src.sy, src.sw, src.sh, pad, pad, cw - pad * 2, ch - pad * 2);
+        lctx.restore();
+        var ox = W * 0.13 + (index % 2) * 18 + slide * W * 0.48;
+        var oy = H * 0.14 + index * H * 0.035;
         ctx.save();
-        ctx.globalAlpha = alpha;
-        ctx.drawImage(layer, dx, 0);
+        ctx.translate(ox + cw / 2, oy + ch / 2);
+        ctx.rotate(angleDeg * Math.PI / 180);
+        ctx.shadowColor = "rgba(24,24,27,0.2)";
+        ctx.shadowBlur = 16;
+        ctx.shadowOffsetY = 8;
+        ctx.drawImage(layer, 0, 0, cw, ch, -cw / 2, -ch / 2, cw, ch);
         ctx.restore();
       }
 
-      function drawSweep(t, duration) {
-        var x = sweepX(t, duration);
-        var g = ctx.createLinearGradient(x, 0, x + BAND, 0);
-        var mid = String(bandAlpha(BAND / 2) / 255);
-        g.addColorStop(0, "rgba(255,255,255,0)");
-        g.addColorStop(0.5, "rgba(255,255,255," + mid + ")");
-        g.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.fillStyle = g;
-        ctx.fillRect(x, 0, BAND, H);
+      function drawPile(images, step) {
+        ctx.fillStyle = "#F5F3EE";
+        ctx.fillRect(0, 0, W, H);
+        var k;
+        for (k = 0; k <= step.i; k += 1) {
+          drawPrint(images[k], CARD_ANGLES[k % CARD_ANGLES.length], 0, k);
+        }
+        if (step.next >= 0) {
+          drawPrint(images[step.next], CARD_ANGLES[step.next % CARD_ANGLES.length], 1 - ease(step.p), step.next);
+        }
       }
 
       function drawEnd(who) {
@@ -526,34 +579,15 @@
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.globalAlpha = 1;
         ctx.globalCompositeOperation = "source-over";
-        ctx.fillStyle = "#0D1928";
-        ctx.fillRect(0, 0, W, H);
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
         if (t >= body) {
           drawEnd(who);
           return;
         }
-        var pair = pairAt(images.length, t);
-        var warm = look === "warm";
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(0, 0, W, H);
-        ctx.clip();
-        if (pair.b >= 0 && look === "turn") {
-          paintPhoto(images[pair.a], pair.la, pair.clip, false);
-          blit(0, 1);
-          paintPhoto(images[pair.b], pair.lb, pair.clip, false);
-          blit((1 - pair.p) * W, 1);
-        } else if (pair.b >= 0) {
-          paintPhoto(images[pair.a], pair.la, pair.clip, warm);
-          blit(0, 1 - pair.p);
-          paintPhoto(images[pair.b], pair.lb, pair.clip, warm);
-          blit(0, pair.p);
-        } else {
-          paintPhoto(images[pair.a], pair.la, pair.clip, warm);
-          blit(0, 1);
-        }
-        ctx.restore();
-        if (look === "sweep") drawSweep(t, body);
+        var step = stepAt(images.length, t);
+        if (look === "pile") drawPile(images, step);
+        else drawCards(images, step);
       }
 
       function loadPhoto(file) {
