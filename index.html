@@ -120,11 +120,13 @@
     .shelf video {
       display: block;
       width: 100%;
-      height: clamp(200px, 34vh, 300px);
+      height: clamp(210px, 36vh, 320px);
       object-fit: cover;
       object-position: center;
       background: #0D1928;
+      pointer-events: none;
     }
+    .shelf label.pile video { background: #F5F3EE; }
     .shelf span { display: block; padding: 12px 14px 14px; }
     .shelf strong {
       display: block;
@@ -295,13 +297,13 @@
       <legend>모습</legend>
       <label class="on">
         <input type="radio" name="look" value="cards" checked>
-        <span><strong>세운 카드</strong><em>가운데 카드가 돌고, 옆 카드가 섭니다.</em></span>
-        <video muted loop playsinline autoplay preload="auto" src="template-previews/stand-faces.mp4"></video>
+        <span><strong>세운 카드</strong><em>앞 카드가 옆으로 물러나고, 다음 인물이 들어옵니다.</em></span>
+        <video muted loop playsinline autoplay preload="auto" src="template-previews/stand-faces.mp4?v=20261027c"></video>
       </label>
-      <label>
+      <label class="pile">
         <input type="radio" name="look" value="pile">
-        <span><strong>포개기</strong><em>흰 테 사진이 기울어 겹칩니다.</em></span>
-        <video muted loop playsinline autoplay preload="auto" src="template-previews/pile-faces.mp4"></video>
+        <span><strong>포개기</strong><em>다음 인화가 위에서 내려와 겹칩니다.</em></span>
+        <video muted loop playsinline autoplay preload="auto" src="template-previews/pile-faces.mp4?v=20261027c"></video>
       </label>
     </fieldset>
     <p class="cap">예시 영상 · 손님 사진 아님</p>
@@ -324,13 +326,171 @@
   </main>
   <canvas id="stage" width="720" height="1280"></canvas>
   <script>
-    var HERO = 1.5;
-    var MOVE = 0.7;
-    var ONE = 3.0;
     var W = 720;
     var H = 1280;
     var END = 1.6;
-    var CARD_ANGLES = [-12, 8, -6, 10, -4, 7];
+    var FACE_W = 768;
+    var FACE_H = 1024;
+    var STAND = {
+      lead: 0.35,
+      travel: 1.05,
+      rest: 0.9,
+      homeX: 110,
+      homeY: 280,
+      w: 500,
+      h: 700,
+      asideX: 240,
+      asideY: 16,
+      enterX: 860
+    };
+    var PILE = {
+      lead: 0.35,
+      fall: 1.25,
+      settle: 0.38,
+      rest: 0.72,
+      w: 520,
+      h: 660,
+      margin: 28,
+      baseX: 360,
+      baseY: 700,
+      stack: 92,
+      overshoot: 20
+    };
+    var PILE_ANGLES = [-0.15, 0.13, -0.09, 0.15, -0.07, 0.1];
+    var PILE_XOFF = [-18, 34, -26, 16, -12, 22];
+
+    function standSlot() { return STAND.travel + STAND.rest; }
+    function pileSlot() { return PILE.fall + PILE.settle + PILE.rest; }
+
+    function smooth(p) {
+      var u = Math.max(0, Math.min(1, p));
+      return u * u * (3 - 2 * u);
+    }
+
+    function bodySeconds(n, look) {
+      var count = Math.max(0, n | 0);
+      if (count <= 1) return 3;
+      if (look === "pile") return PILE.lead + (count - 1) * pileSlot() + 0.2;
+      return STAND.lead + (count - 1) * standSlot() + 0.15;
+    }
+
+    function arrival(index, t, lead, travel, slot) {
+      if (index <= 0) return 1;
+      var start = lead + (index - 1) * slot;
+      if (t < start) return -1;
+      if (t >= start + travel) return 1;
+      return smooth((t - start) / travel);
+    }
+
+    function standCards(n, t) {
+      var slot = standSlot();
+      var cards = [];
+      var i;
+      var k;
+      for (i = 0; i < n; i += 1) {
+        var enter = arrival(i, t, STAND.lead, STAND.travel, slot);
+        if (enter < 0) continue;
+        var push = 0;
+        for (k = i + 1; k < n; k += 1) {
+          var later = arrival(k, t, STAND.lead, STAND.travel, slot);
+          if (later < 0) break;
+          push += later;
+        }
+        cards.push({
+          i: i,
+          x: STAND.enterX + (STAND.homeX - STAND.enterX) * enter - push * STAND.asideX,
+          y: STAND.homeY + (1 - enter) * 36 + push * STAND.asideY,
+          w: STAND.w,
+          h: STAND.h,
+          enter: enter
+        });
+      }
+      return cards;
+    }
+
+    function pileCards(n, t) {
+      var slot = pileSlot();
+      var items = [];
+      var i;
+      for (i = 0; i < n; i += 1) {
+        var restX = PILE.baseX + PILE_XOFF[i % PILE_XOFF.length];
+        var restY = PILE.baseY - i * PILE.stack;
+        var ang = PILE_ANGLES[i % PILE_ANGLES.length];
+        var x = restX;
+        var y = restY;
+        var rot = ang;
+        if (i > 0) {
+          var start = PILE.lead + (i - 1) * slot;
+          if (t < start) continue;
+          var local = t - start;
+          if (local < PILE.fall) {
+            var p = smooth(local / PILE.fall);
+            var y0 = -PILE.h * 0.55;
+            var y1 = restY + PILE.overshoot;
+            y = y0 + (y1 - y0) * p;
+            x = (restX + 64) + (restX - restX - 64) * p;
+            rot = -0.46 + (ang + 0.46) * p;
+          } else if (local < PILE.fall + PILE.settle) {
+            var s = smooth((local - PILE.fall) / PILE.settle);
+            y = (restY + PILE.overshoot) + (restY - restY - PILE.overshoot) * s;
+            rot = ang;
+          }
+        }
+        items.push({ i: i, x: x, y: y, rot: rot, w: PILE.w, h: PILE.h });
+      }
+      return items;
+    }
+
+    function audit() {
+      var fail = [];
+      function check(cond, msg) { if (!cond) fail.push(msg); }
+      var a = standCards(2, 0.2);
+      var b = standCards(2, 1.0);
+      var c = standCards(2, 2.0);
+      check(a.length === 1 && a[0].i === 0, "0.2초에 카드가 하나가 아님");
+      check(b.length === 2, "1.0초에 두 번째 카드가 없음");
+      var b0 = b[0];
+      var b1 = b[1];
+      check(b1.x < W - 80, "1.0초에 새 카드가 화면 밖에 있음");
+      check(a[0].x - b0.x > 120, "1.0초에 앞 카드가 거의 안 비킴");
+      check(Math.abs(c[1].x - STAND.homeX) < 0.01 && c[1].i === 1, "2.0초에 새 카드가 앞에 없음");
+      check(a[0].x - c[0].x > 180, "2.0초에 앞 카드가 10px만 비킴");
+      var h1 = standCards(2, 1.7);
+      var h2 = standCards(2, 2.3);
+      check(h1[0].x === h2[0].x && h1[1].x === h2[1].x && h1[0].y === h2[0].y, "세운 카드가 도착 뒤에 흔들림");
+      var p0 = pileCards(2, 0.2);
+      var p1 = pileCards(2, 1.0);
+      var p2 = pileCards(2, 2.0);
+      check(p0.length === 1, "0.2초에 인화가 하나가 아님");
+      check(p1.length === 2 && p1[1].y < p0[0].y - 180, "1.0초에 새 인화가 위에서 오지 않음");
+      check(p2[1].y < p2[0].y - 50, "2.0초에 더미가 높아지지 않음");
+      check(p2[1].y > p1[1].y + 250, "새 인화가 내려앉지 않음");
+      check(Math.abs(p2[1].y - (PILE.baseY - PILE.stack)) < 0.01, "2.0초에 안착이 끝나지 않음");
+      var q1 = pileCards(2, 2.1);
+      var q2 = pileCards(2, 2.5);
+      check(q1[1].y === q2[1].y && q1[1].rot === q2[1].rot && q1[0].rot === q2[0].rot, "포개기가 안착 뒤에 흔들림");
+      check(bodySeconds(6, "cards") + END < 20, "세운 카드 6장이 20초를 넘음");
+      check(bodySeconds(6, "pile") + END < 20, "포개기 6장이 20초를 넘음");
+      check(standCards(1, 1.2)[0].x === standCards(1, 2.4)[0].x, "사진 한 장이 흔들림");
+      var r;
+      for (r = 0; r < 30; r += 1) {
+        var rt = Math.random() * 0.3;
+        if (standCards(6, rt).length !== 1) fail.push("세운 카드가 너무 일찍 등장 " + rt);
+        if (pileCards(6, rt).length !== 1) fail.push("인화가 너무 일찍 등장 " + rt);
+      }
+      return {
+        ok: fail.length === 0,
+        fail: fail,
+        cards6: bodySeconds(6, "cards") + END,
+        pile6: bodySeconds(6, "pile") + END,
+        stand02x: a[0].x,
+        stand20back: c[0].x,
+        stand20front: c[1].x,
+        pile02y: p0[0].y,
+        pile10y: p1[1].y,
+        pile20y: p2[1].y
+      };
+    }
 
     function cardLine(raw) {
       var text = String(raw == null ? "" : raw).split(/\s+/).join(" ").trim();
@@ -356,39 +516,6 @@
       return name;
     }
 
-    function bodySeconds(n) {
-      if (n <= 1) return ONE;
-      return HERO * n + MOVE * (n - 1);
-    }
-
-    function ease(p) {
-      var u = Math.max(0, Math.min(1, p));
-      return u * u * (3 - 2 * u);
-    }
-
-    function stepAt(n, t) {
-      if (n < 1) return { i: 0, next: -1, p: 0 };
-      if (n === 1) return { i: 0, next: -1, p: 0 };
-      var slot = HERO + MOVE;
-      var idx = Math.floor(Math.max(0, t) / slot);
-      if (idx >= n - 1) return { i: n - 1, next: -1, p: 0 };
-      var local = t - idx * slot;
-      if (local <= HERO) return { i: idx, next: -1, p: 0 };
-      return { i: idx, next: idx + 1, p: (local - HERO) / MOVE };
-    }
-
-    function coverInto(img, dw, dh) {
-      var scale = Math.max(dw / img.width, dh / img.height);
-      var sw = dw / scale;
-      var sh = dh / scale;
-      return {
-        sx: (img.width - sw) / 2,
-        sy: (img.height - sh) / 2,
-        sw: sw,
-        sh: sh
-      };
-    }
-
     function traceRound(c, x, y, w, h, r) {
       var rr = Math.max(0, Math.min(r, w / 2, h / 2));
       c.beginPath();
@@ -399,6 +526,238 @@
       c.arcTo(x, y, x + w, y, rr);
       c.closePath();
     }
+
+    function drawCover(ctx, img, x, y, w, h) {
+      var scale = Math.max(w / img.width, h / img.height);
+      var sw = w / scale;
+      var sh = h / scale;
+      ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, x, y, w, h);
+    }
+
+    function clearShadow(ctx) {
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    }
+
+    function paintCard(ctx, img, x, y, w, h) {
+      var thick = 18;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.beginPath();
+      ctx.ellipse(w * 0.5, h + 28, w * 0.36, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#B7AA9C";
+      ctx.beginPath();
+      ctx.moveTo(w - 10, 18);
+      ctx.lineTo(w + thick, 8);
+      ctx.lineTo(w + thick, h - 16);
+      ctx.lineTo(w - 10, h - 8);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "#E6DFD4";
+      ctx.beginPath();
+      ctx.moveTo(16, 0);
+      ctx.lineTo(w - 8, 0);
+      ctx.lineTo(w + thick - 8, -12);
+      ctx.lineTo(22, -12);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "#F7F4EE";
+      traceRound(ctx, 0, 0, w, h, 22);
+      ctx.fill();
+      ctx.save();
+      traceRound(ctx, 24, 28, w - 48, h - 56, 8);
+      ctx.clip();
+      drawCover(ctx, img, 24, 28, w - 48, h - 56);
+      ctx.restore();
+      ctx.restore();
+      clearShadow(ctx);
+    }
+
+    function paintPrint(ctx, img, item) {
+      var w = item.w;
+      var h = item.h;
+      var m = PILE.margin;
+      ctx.save();
+      ctx.translate(item.x, item.y);
+      ctx.rotate(item.rot);
+      ctx.shadowColor = "rgba(24,24,27,0.28)";
+      ctx.shadowBlur = 22;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = "#FFFFFF";
+      traceRound(ctx, -w / 2, -h / 2, w, h, 10);
+      ctx.fill();
+      clearShadow(ctx);
+      ctx.save();
+      traceRound(ctx, -w / 2 + m, -h / 2 + m, w - m * 2, h - m * 2, 3);
+      ctx.clip();
+      drawCover(ctx, img, -w / 2 + m, -h / 2 + m, w - m * 2, h - m * 2);
+      ctx.restore();
+      ctx.restore();
+      clearShadow(ctx);
+    }
+
+    function drawStand(ctx, images, t) {
+      ctx.fillStyle = "#0D1928";
+      ctx.fillRect(0, 0, W, H);
+      var cards = standCards(images.length, t);
+      var i;
+      for (i = 0; i < cards.length; i += 1) {
+        var card = cards[i];
+        if (card.x >= W || card.x + card.w <= -40) continue;
+        paintCard(ctx, images[card.i], card.x, card.y, card.w, card.h);
+      }
+    }
+
+    function drawPile(ctx, images, t) {
+      ctx.fillStyle = "#F5F3EE";
+      ctx.fillRect(0, 0, W, H);
+      var items = pileCards(images.length, t);
+      var i;
+      for (i = 0; i < items.length; i += 1) paintPrint(ctx, images[items[i].i], items[i]);
+    }
+
+    function drawEnd(ctx, who) {
+      ctx.fillStyle = "#0D1928";
+      ctx.fillRect(0, 0, W, H);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = '800 68px Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+      var brand = "MBOX";
+      var top = 520;
+      ctx.fillText(brand, W / 2, top);
+      var bw = ctx.measureText(brand).width;
+      ctx.fillStyle = "#B89047";
+      ctx.fillRect((W - bw) / 2, top + 92, bw, 6);
+      ctx.fillStyle = "#E8C26D";
+      ctx.font = '700 36px Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+      ctx.fillText(who, W / 2, top + 124);
+      ctx.fillStyle = "#D6D3D1";
+      ctx.font = '500 22px Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+      ctx.fillText("부스에서 만든 짧은 영상", W / 2, top + 188);
+    }
+
+    function drawAt(ctx, images, look, who, t) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
+      clearShadow(ctx);
+      var body = bodySeconds(images.length, look);
+      if (who && t >= body) {
+        drawEnd(ctx, who);
+        return;
+      }
+      var time = t;
+      if (!who && t > body) time = body;
+      if (look === "pile") drawPile(ctx, images, time);
+      else drawStand(ctx, images, time);
+    }
+
+    function skinScore(data, cols, x0, y0, w, h) {
+      var s = 0;
+      var n = 0;
+      var y;
+      var x;
+      var y1 = y0 + h;
+      var x1 = x0 + w;
+      for (y = y0; y < y1; y += 2) {
+        for (x = x0; x < x1; x += 2) {
+          var i = (y * cols + x) * 4;
+          var r = data[i];
+          var g = data[i + 1];
+          var b = data[i + 2];
+          var cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+          var cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+          if (cr >= 133 && cr <= 173 && cb >= 77 && cb <= 127 && r > 45 && g > 25 && b > 15) s += 1;
+          n += 1;
+        }
+      }
+      return n ? s / n : 0;
+    }
+
+    function focusRect(img) {
+      var iw = img.width;
+      var ih = img.height;
+      var aspect = FACE_W / FACE_H;
+      var sw;
+      var sh;
+      if (iw / ih > aspect) {
+        sh = ih;
+        sw = Math.min(iw, sh * aspect);
+      } else {
+        sw = iw;
+        sh = Math.min(ih, sw / aspect);
+      }
+      var cols = 72;
+      var rows = Math.max(8, Math.round(cols * ih / iw));
+      var sample = document.createElement("canvas");
+      sample.width = cols;
+      sample.height = rows;
+      var g = sample.getContext("2d", { willReadFrequently: true });
+      g.drawImage(img, 0, 0, cols, rows);
+      var data = g.getImageData(0, 0, cols, rows).data;
+      var winW = Math.max(4, Math.min(cols, Math.round(sw / iw * cols)));
+      var winH = Math.max(4, Math.min(rows, Math.round(sh / ih * rows)));
+      var best = -1;
+      var bx = 0;
+      var by = 0;
+      var stepX = Math.max(1, Math.round(winW / 8));
+      var stepY = Math.max(1, Math.round(winH / 8));
+      var y;
+      var x;
+      for (y = 0; y + winH <= rows; y += stepY) {
+        for (x = 0; x + winW <= cols; x += stepX) {
+          var score = skinScore(data, cols, x, y, winW, winH);
+          var cx = (x + winW / 2) / cols - 0.5;
+          var cy = (y + winH / 2) / rows - 0.4;
+          score -= cx * cx * 0.18 + cy * cy * 0.08;
+          if (score > best) {
+            best = score;
+            bx = x;
+            by = y;
+          }
+        }
+      }
+      var cx0 = Math.max(0, Math.round((cols - winW) / 2));
+      var cy0 = Math.max(0, Math.round((rows - winH) * 0.3));
+      var center = skinScore(data, cols, cx0, cy0, winW, winH);
+      if (!(best > 0.045 && best > center + 0.025)) {
+        return { sx: (iw - sw) / 2, sy: Math.max(0, (ih - sh) * 0.28), sw: sw, sh: sh };
+      }
+      return {
+        sx: Math.max(0, Math.min(iw - sw, bx / cols * iw)),
+        sy: Math.max(0, Math.min(ih - sh, by / rows * ih)),
+        sw: sw,
+        sh: sh
+      };
+    }
+
+    function rasterPortrait(img) {
+      var canvas = document.createElement("canvas");
+      canvas.width = FACE_W;
+      canvas.height = FACE_H;
+      var ctx = canvas.getContext("2d");
+      var rect = focusRect(img);
+      ctx.drawImage(img, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, FACE_W, FACE_H);
+      return canvas;
+    }
+
+    var mboxMotion = {
+      audit: audit,
+      drawAt: drawAt,
+      bodySeconds: bodySeconds,
+      standCards: standCards,
+      pileCards: pileCards,
+      rasterPortrait: rasterPortrait,
+      END: END,
+      W: W,
+      H: H
+    };
+    window.mboxMotion = mboxMotion;
 
     if (typeof document !== "undefined") {
       var looks = document.querySelectorAll('input[name="look"]');
@@ -412,10 +771,6 @@
       var keep = document.getElementById("keep");
       var stage = document.getElementById("stage");
       var ctx = stage.getContext("2d");
-      var layer = document.createElement("canvas");
-      layer.width = W;
-      layer.height = H;
-      var lctx = layer.getContext("2d");
       var made = null;
       var madeUrl = "";
       var busy = false;
@@ -434,7 +789,9 @@
       function markLook() {
         var i;
         for (i = 0; i < looks.length; i += 1) {
-          looks[i].parentNode.className = looks[i].checked ? "on" : "";
+          var pile = looks[i].value === "pile" ? "pile" : "";
+          var on = looks[i].checked ? "on" : "";
+          looks[i].parentNode.className = (pile + " " + on).trim();
         }
       }
 
@@ -453,154 +810,29 @@
         return "";
       }
 
-      function prepareCard(img) {
-        var cw = W * 0.72;
-        var ch = H * 0.78;
-        var x = (W - cw) / 2;
-        var y = (H - ch) / 2;
-        var src = coverInto(img, cw, ch);
-        lctx.setTransform(1, 0, 0, 1, 0, 0);
-        lctx.clearRect(0, 0, W, H);
-        lctx.save();
-        traceRound(lctx, x, y, cw, ch, cw * 0.06);
-        lctx.clip();
-        lctx.drawImage(img, src.sx, src.sy, src.sw, src.sh, x, y, cw, ch);
-        lctx.restore();
-        return { x: x, y: y, w: cw, h: ch };
-      }
-
-      function blitYaw(card, yaw) {
-        var rad = yaw * Math.PI / 180;
-        var c = Math.cos(rad);
-        var destW = card.w * Math.max(0.16, Math.abs(c));
-        var cx = W * 0.5 + Math.sin(rad) * W * 0.36;
-        var destX = cx - destW / 2;
-        var strips = 36;
-        var s;
-        ctx.save();
-        ctx.shadowColor = "rgba(0,0,0,0.45)";
-        ctx.shadowBlur = 22;
-        ctx.fillStyle = "#0D1928";
-        ctx.fillRect(destX, card.y, destW, card.h);
-        ctx.restore();
-        for (s = 0; s < strips; s += 1) {
-          var u0 = s / strips;
-          var edge = Math.abs(u0 - 0.5) * 2;
-          var pinch = (1 - Math.abs(c)) * card.h * 0.1 * edge;
-          var sx = card.x + u0 * card.w;
-          var sw = card.w / strips + 0.5;
-          var dx = destX + u0 * destW;
-          var dw = destW / strips + 0.8;
-          ctx.drawImage(layer, sx, card.y, sw, card.h, dx, card.y + pinch, dw, card.h - pinch * 2);
-        }
-      }
-
-      function drawCards(images, step) {
-        ctx.fillStyle = "#0D1928";
-        ctx.fillRect(0, 0, W, H);
-        var focus = step.i + (step.next >= 0 ? ease(step.p) : 0);
-        var order = [];
-        var a;
-        for (a = 0; a < images.length; a += 1) {
-          var rel = a - focus;
-          if (Math.abs(rel) > 1.25) continue;
-          order.push({ a: a, rel: rel, depth: Math.abs(rel) });
-        }
-        order.sort(function (u, v) { return v.depth - u.depth; });
-        for (a = 0; a < order.length; a += 1) {
-          var yaw = Math.max(-78, Math.min(78, order[a].rel * 62));
-          var card = prepareCard(images[order[a].a]);
-          blitYaw(card, yaw);
-        }
-      }
-
-      function drawPrint(img, angleDeg, slide, index) {
-        var cw = W * 0.74;
-        var ch = H * 0.5;
-        var pad = 16;
-        var src = coverInto(img, cw - pad * 2, ch - pad * 2);
-        lctx.setTransform(1, 0, 0, 1, 0, 0);
-        lctx.clearRect(0, 0, W, H);
-        lctx.fillStyle = "#FFFFFF";
-        traceRound(lctx, 0, 0, cw, ch, 8);
-        lctx.fill();
-        lctx.save();
-        traceRound(lctx, pad, pad, cw - pad * 2, ch - pad * 2, 4);
-        lctx.clip();
-        lctx.drawImage(img, src.sx, src.sy, src.sw, src.sh, pad, pad, cw - pad * 2, ch - pad * 2);
-        lctx.restore();
-        var ox = W * 0.13 + (index % 2) * 18 + slide * W * 0.48;
-        var oy = H * 0.14 + index * H * 0.035;
-        ctx.save();
-        ctx.translate(ox + cw / 2, oy + ch / 2);
-        ctx.rotate(angleDeg * Math.PI / 180);
-        ctx.shadowColor = "rgba(24,24,27,0.2)";
-        ctx.shadowBlur = 16;
-        ctx.shadowOffsetY = 8;
-        ctx.drawImage(layer, 0, 0, cw, ch, -cw / 2, -ch / 2, cw, ch);
-        ctx.restore();
-      }
-
-      function drawPile(images, step) {
-        ctx.fillStyle = "#F5F3EE";
-        ctx.fillRect(0, 0, W, H);
-        var k;
-        for (k = 0; k <= step.i; k += 1) {
-          drawPrint(images[k], CARD_ANGLES[k % CARD_ANGLES.length], 0, k);
-        }
-        if (step.next >= 0) {
-          drawPrint(images[step.next], CARD_ANGLES[step.next % CARD_ANGLES.length], 1 - ease(step.p), step.next);
-        }
-      }
-
-      function drawEnd(who) {
-        ctx.fillStyle = "#0D1928";
-        ctx.fillRect(0, 0, W, H);
-        ctx.textAlign = "center";
-        ctx.textBaseline = "top";
-        ctx.fillStyle = "#FFFFFF";
-        ctx.font = '800 68px Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-        var brand = "MBOX";
-        var top = 520;
-        ctx.fillText(brand, W / 2, top);
-        var bw = ctx.measureText(brand).width;
-        ctx.fillStyle = "#B89047";
-        ctx.fillRect((W - bw) / 2, top + 92, bw, 6);
-        ctx.fillStyle = "#E8C26D";
-        ctx.font = '700 36px Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-        ctx.fillText(who, W / 2, top + 124);
-        ctx.fillStyle = "#D6D3D1";
-        ctx.font = '500 22px Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-        ctx.fillText("부스에서 만든 짧은 영상", W / 2, top + 188);
-      }
-
-      function drawAt(images, look, who, t) {
-        var body = bodySeconds(images.length);
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.globalAlpha = 1;
-        ctx.globalCompositeOperation = "source-over";
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetY = 0;
-        if (t >= body) {
-          drawEnd(who);
-          return;
-        }
-        var step = stepAt(images.length, t);
-        if (look === "pile") drawPile(images, step);
-        else drawCards(images, step);
-      }
-
       function loadPhoto(file) {
-        return createImageBitmap(file).then(function (bmp) {
-          var edge = Math.max(bmp.width, bmp.height);
-          var scale = Math.min(1, 1280 / edge);
-          if (scale === 1) return bmp;
-          var c = document.createElement("canvas");
-          c.width = Math.max(2, Math.round(bmp.width * scale));
-          c.height = Math.max(2, Math.round(bmp.height * scale));
-          c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
-          if (bmp.close) bmp.close();
-          return createImageBitmap(c);
+        var ready = (typeof createImageBitmap === "function")
+          ? createImageBitmap(file).catch(function () { return null; })
+          : Promise.resolve(null);
+        return ready.then(function (bmp) {
+          if (bmp) {
+            var canvas = rasterPortrait(bmp);
+            if (bmp.close) bmp.close();
+            return canvas;
+          }
+          return new Promise(function (resolve, reject) {
+            var url = URL.createObjectURL(file);
+            var img = new Image();
+            img.onload = function () {
+              URL.revokeObjectURL(url);
+              resolve(rasterPortrait(img));
+            };
+            img.onerror = function () {
+              URL.revokeObjectURL(url);
+              reject(new Error("photo"));
+            };
+            img.src = url;
+          });
         });
       }
 
@@ -609,6 +841,12 @@
       }
 
       function finish(blob) {
+        if (!blob || blob.size < 1200) {
+          busy = false;
+          make.disabled = false;
+          setStatus("영상을 담지 못했습니다.");
+          return;
+        }
         if (madeUrl) URL.revokeObjectURL(madeUrl);
         made = blob;
         madeUrl = URL.createObjectURL(blob);
@@ -625,23 +863,20 @@
         make.disabled = false;
       }
 
-      function record(images, look, who) {
+      function captureClip(images, look, who, done, fail) {
         var mime = mimeType();
         if (!mime) {
-          busy = false;
-          make.disabled = false;
-          setStatus("이 브라우저에서는 영상을 파일로 담지 못합니다.");
+          fail("mime");
           return;
         }
-        var total = bodySeconds(images.length) + END;
+        var total = bodySeconds(images.length, look) + END;
+        drawAt(ctx, images, look, who, 0);
         var stream = stage.captureStream(30);
         var rec;
         try {
           rec = new MediaRecorder(stream, { mimeType: mime });
         } catch (err) {
-          busy = false;
-          make.disabled = false;
-          setStatus("이 브라우저에서는 영상을 파일로 담지 못합니다.");
+          fail("recorder");
           return;
         }
         var chunks = [];
@@ -649,19 +884,14 @@
           if (e.data && e.data.size) chunks.push(e.data);
         };
         rec.onstop = function () {
-          finish(new Blob(chunks, { type: rec.mimeType || mime }));
+          done(new Blob(chunks, { type: rec.mimeType || mime }));
         };
-        rec.onerror = function () {
-          busy = false;
-          make.disabled = false;
-          setStatus("영상을 담지 못했습니다.");
-        };
-        drawAt(images, look, who, 0);
+        rec.onerror = function () { fail("error"); };
         var t0 = performance.now();
         rec.start(100);
         function frame(now) {
           var t = (now - t0) / 1000;
-          drawAt(images, look, who, Math.min(t, total));
+          drawAt(ctx, images, look, who, Math.min(t, total));
           if (t < total + 0.12) {
             requestAnimationFrame(frame);
             return;
@@ -670,6 +900,42 @@
         }
         requestAnimationFrame(frame);
       }
+
+      function record(images, look, who) {
+        captureClip(images, look, who, finish, function () {
+          busy = false;
+          make.disabled = false;
+          setStatus("이 브라우저에서는 영상을 파일로 담지 못합니다.");
+        });
+      }
+
+      mboxMotion.paint = function (look, t) {
+        drawAt(ctx, window.__faces, look, "", t);
+        return stage.toDataURL("image/png");
+      };
+      mboxMotion.captureSample = function (look, who) {
+        return new Promise(function (resolve, reject) {
+          captureClip(window.__faces, look, who, function (blob) {
+            var reader = new FileReader();
+            reader.onload = function () { resolve({ type: blob.type, url: reader.result, size: blob.size }); };
+            reader.onerror = function () { reject(new Error("read")); };
+            reader.readAsDataURL(blob);
+          }, reject);
+        });
+      };
+      mboxMotion.loadFaces = function (dataUrls) {
+        return Promise.all(dataUrls.map(function (src) {
+          return new Promise(function (resolve, reject) {
+            var img = new Image();
+            img.onload = function () { resolve(rasterPortrait(img)); };
+            img.onerror = function () { reject(new Error("face")); };
+            img.src = src;
+          });
+        })).then(function (faces) {
+          window.__faces = faces;
+          return faces.length;
+        });
+      };
 
       var n;
       for (n = 0; n < looks.length; n += 1) {
