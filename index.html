@@ -326,34 +326,34 @@
       <p class="aside">사진은 이 폰 안에만 있습니다. 소리 없는 세로 영상이고, 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다.</p>
     </div>
     <div id="player" class="player">
-      <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-faces.mp4?v=20261027f"></video>
+      <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-faces.mp4?v=20261027g"></video>
       <canvas id="stage" width="720" height="1560"></canvas>
     </div>
     <fieldset class="shelf">
       <legend>모습</legend>
       <label class="on">
         <input type="radio" name="look" value="cube" checked>
-        <span class="frame"><img alt="" src="template-previews/cube-poster.jpg?v=20261027f"></span>
+        <span class="frame"><img alt="" src="template-previews/cube-poster.jpg?v=20261027g"></span>
         <strong>큐브</strong><em>가까운 큐브가 한 번 돌아 다음 얼굴을 보여 줍니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="cards">
-        <span class="frame"><img alt="" src="template-previews/stand-poster.jpg?v=20261027f"></span>
+        <span class="frame"><img alt="" src="template-previews/stand-poster.jpg?v=20261027g"></span>
         <strong>세운 카드</strong><em>두 얼굴이 나란히 선 뒤 새 카드가 앞을 차지합니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="pile">
-        <span class="frame"><img alt="" src="template-previews/pile-poster.jpg?v=20261027f"></span>
+        <span class="frame"><img alt="" src="template-previews/pile-poster.jpg?v=20261027g"></span>
         <strong>포개기</strong><em>다음 인화가 위에서 떨어져 겹칩니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="flip">
-        <span class="frame"><img alt="" src="template-previews/flip-poster.jpg?v=20261027f"></span>
+        <span class="frame"><img alt="" src="template-previews/flip-poster.jpg?v=20261027g"></span>
         <strong>뒤집기</strong><em>큰 카드가 돌려져 다음 얼굴을 보여 줍니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="fan">
-        <span class="frame"><img alt="" src="template-previews/fan-poster.jpg?v=20261027f"></span>
+        <span class="frame"><img alt="" src="template-previews/fan-poster.jpg?v=20261027g"></span>
         <strong>붙여 오르기</strong><em>카드가 올라오며 여러 얼굴이 펼쳐집니다.</em>
       </label>
     </fieldset>
@@ -400,7 +400,7 @@
     var PILE = { lead: 0.22, fall: 1.35, settle: 0.5, rest: 0.25, margin: 32, overshoot: 18 };
     var FLIP = { lead: 0.15, spin: 1.72, rest: 0.45 };
     var FAN = { lead: 0.35, rise: 1.4, hold: 0.45, tuck: 0.4, rest: 0.12 };
-    var CUBE = { lead: 0.25, turn: 1.22, hold: 0.55, rest: 0.2, size: 2, fov: 0.52, pad: 1.08, corner: 0.78 };
+    var CUBE = { lead: 0.25, turn: 1.22, hold: 0.55, rest: 0.2, size: 2, fov: 0.8, pad: 1.08, corner: 0.78 };
     var CUBE_Y_SIGN = 1;
     var FACE_FRONT = 1;
     var FACE_SIDE = 2;
@@ -456,10 +456,10 @@
       return leadOf(look) + (count - 1) * slotOf(look) + 0.08;
     }
 
-    function standIdle(i) { return { i: i, x: 16, y: 22, w: 688, h: 1516, rot: 0, rotZ: 0 }; }
-    function standBack(i) { return { i: i, x: 18, y: 40, w: 292, h: 1360, rot: 0, rotZ: 0 }; }
-    function standFar(i) { return { i: i, x: 408, y: 300, w: 236, h: 680, rot: 0.98, rotZ: 0 }; }
-    function standClose(i) { return { i: i, x: 368, y: 96, w: 292, h: 1040, rot: 0.58, rotZ: 0 }; }
+    function standIdle(i) { return { i: i, x: 148, y: 268, w: 424, h: 900, rot: 0, rotZ: 0 }; }
+    function standBack(i) { return { i: i, x: 48, y: 340, w: 250, h: 560, rot: 0.15, rotZ: 0 }; }
+    function standFar(i) { return { i: i, x: 430, y: 460, w: 210, h: 460, rot: 0.72, rotZ: 0 }; }
+    function standClose(i) { return { i: i, x: 250, y: 300, w: 360, h: 780, rot: 0.34, rotZ: 0 }; }
     function cardInside(card) {
       return card.x >= -2 && card.y >= -2 && card.x + card.w <= W + 2 && card.y + card.h <= H + 2;
     }
@@ -504,9 +504,9 @@
       return {
         i: i,
         cx: 360 + side * 18,
-        cy: 800 - i * 12,
-        w: 650,
-        h: 1320,
+        cy: 730 - i * 10,
+        w: 430,
+        h: 900,
         rot: side * -0.04
       };
     }
@@ -561,11 +561,11 @@
       return { front: step, back: step + 1, angle: p * Math.PI };
     }
 
-    function fanIdle(i) { return { i: i, x: 16, y: 22, w: 688, h: 1516, rot: -0.04, rotZ: 0 }; }
-    function fanBelow(i) { return { i: i, x: 80, y: H + 40, w: 620, h: 1400, rot: 0, rotZ: 0 }; }
-    function fanLeft(i) { return { i: i, x: 18, y: 28, w: 268, h: 1488, rot: 0.52, rotZ: -0.16 }; }
-    function fanMid(i) { return { i: i, x: 226, y: 12, w: 268, h: 1528, rot: 0, rotZ: 0 }; }
-    function fanRight(i) { return { i: i, x: 434, y: 28, w: 268, h: 1488, rot: -0.52, rotZ: 0.16 }; }
+    function fanIdle(i) { return { i: i, x: 148, y: 268, w: 424, h: 900, rot: -0.04, rotZ: 0 }; }
+    function fanBelow(i) { return { i: i, x: 160, y: H + 40, w: 400, h: 820, rot: 0, rotZ: 0 }; }
+    function fanLeft(i) { return { i: i, x: 36, y: 320, w: 230, h: 620, rot: 0.48, rotZ: -0.1 }; }
+    function fanMid(i) { return { i: i, x: 210, y: 250, w: 280, h: 780, rot: 0, rotZ: 0 }; }
+    function fanRight(i) { return { i: i, x: 450, y: 330, w: 220, h: 600, rot: -0.5, rotZ: 0.12 }; }
     function fanOff(i) { return { i: i, x: -520, y: 200, w: 420, h: 1000, rot: 0.2, rotZ: -0.4 }; }
 
     function fanLayout(n, t) {
@@ -847,15 +847,118 @@
       return "dust";
     }
 
+    function roomTones(bg) {
+      if (bg === "#F4EFE6") {
+        return { wall0: "#FBF7F1", wall1: "#E4D5C4", floor0: "#D5C6B2", floor1: "#B39F88", line: "#CDB8A0", mat: "#EFE6DA", edge: "#C9B8A4" };
+      }
+      if (bg === "#0D1928") {
+        return { wall0: "#2A435C", wall1: "#0D1928", floor0: "#0E1824", floor1: "#1B2E44", line: "#3D5670", mat: "#1A2C40", edge: "#24384C" };
+      }
+      return { wall0: "#6E6256", wall1: "#171410", floor0: "#12100E", floor1: "#4A3E32", line: "#8A7560", mat: "#3A332C", edge: "#5C5146" };
+    }
+
+    var printCache = typeof WeakMap === "function" ? new WeakMap() : null;
+    function asPrint(img) {
+      if (!img) return img;
+      if (printCache && printCache.has(img)) return printCache.get(img);
+      var c = document.createElement("canvas");
+      c.width = img.width;
+      c.height = img.height;
+      var g = c.getContext("2d");
+      g.fillStyle = "#F3F0EA";
+      g.fillRect(0, 0, c.width, c.height);
+      var m = Math.round(Math.min(c.width, c.height) * 0.04);
+      g.drawImage(img, m, m, c.width - m * 2, c.height - m * 2);
+      if (printCache) printCache.set(img, c);
+      return c;
+    }
+
+    function paintFloorShadow(ctx, x, y, w, h) {
+      var foot = y + h;
+      ctx.save();
+      ctx.fillStyle = "rgba(0,0,0,0.42)";
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.1, foot + 1);
+      ctx.lineTo(x + w * 0.92, foot + 3);
+      ctx.lineTo(x + w * 1.04, foot + 26);
+      ctx.lineTo(x + w * 0.04, foot + 30);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function paintMat(ctx, tone, img) {
+      var x = 72;
+      var y = 318;
+      var w = 236;
+      var h = 500;
+      paintFloorShadow(ctx, x, y, w, h);
+      ctx.fillStyle = tone.edge;
+      ctx.beginPath();
+      ctx.moveTo(x + 22, y);
+      ctx.lineTo(x + w - 18, y);
+      ctx.lineTo(x + w, y + h);
+      ctx.lineTo(x, y + h);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = tone.mat;
+      ctx.beginPath();
+      ctx.moveTo(x + 36, y + 16);
+      ctx.lineTo(x + w - 34, y + 16);
+      ctx.lineTo(x + w - 16, y + h - 18);
+      ctx.lineTo(x + 16, y + h - 18);
+      ctx.closePath();
+      ctx.fill();
+      if (!img) return;
+      ctx.save();
+      ctx.clip();
+      drawCover(ctx, asPrint(img), x + 18, y + 18, w - 36, h - 36);
+      ctx.restore();
+    }
+
+    function rearImage(look, images, time) {
+      if (!images || images.length < 2 || look === "fan") return null;
+      if (look === "cards") {
+        var shown = standLayout(images.length, time);
+        if (shown.length >= 2) return null;
+        var id = shown[0] ? shown[0].i : 0;
+        return images[id === 0 ? 1 : 0];
+      }
+      if (look === "pile") {
+        if (pileLayout(images.length, time).length >= 2) return null;
+        return images[1];
+      }
+      if (look === "flip") {
+        var fs = flipState(images.length, time);
+        if (fs.angle > 0.5 && fs.angle < 2.6) return null;
+        return images[fs.front === 0 ? 1 : 0];
+      }
+      return images[1];
+    }
+
+    function paintRoom(ctx, bg) {
+      var tone = roomTones(bg);
+      var horizon = 1048;
+      var wall = ctx.createLinearGradient(40, 0, 220, horizon);
+      wall.addColorStop(0, tone.wall0);
+      wall.addColorStop(1, tone.wall1);
+      ctx.fillStyle = wall;
+      ctx.fillRect(0, 0, W, horizon);
+      var floor = ctx.createLinearGradient(0, horizon, 0, H);
+      floor.addColorStop(0, tone.floor0);
+      floor.addColorStop(1, tone.floor1);
+      ctx.fillStyle = floor;
+      ctx.fillRect(0, horizon, W, H - horizon);
+      ctx.fillStyle = tone.line;
+      ctx.fillRect(0, horizon - 8, W, 12);
+    }
+
     function particle(i, kind, t, bg) {
       var dust = kind !== "lights";
-      var count = kind === "off" ? 0 : dust ? 18 : 12;
+      var count = kind === "off" ? 0 : dust ? 8 : 6;
       if (i >= count) return null;
-      var speed = dust ? 22 + unit(i, 2) * 26 : 12 + unit(i, 2) * 16;
-      var y = (unit(i, 1) * H - t * speed) % H;
-      if (y < 0) y += H;
-      var x = (unit(i, 3) * W + Math.sin(t * 0.65 + i) * (dust ? 8 : 14)) % W;
-      if (x < 0) x += W;
+      var y = 20 + unit(i, 1) * 170 + Math.sin(t * 0.4 + i) * 6;
+      var x = 30 + unit(i, 3) * (W - 60);
       var ivory = bg === "#F4EFE6";
       return {
         x: x,
@@ -1064,14 +1167,19 @@
       for (i = 0; i < cards.length; i += 1) {
         var card = cards[i];
         if (!cardInside(card)) continue;
-        paintTurn(ctx, images[card.i], null, card.rot, card.x + card.w / 2, card.y + card.h / 2, card.w, card.h);
+        paintFloorShadow(ctx, card.x, card.y, card.w, card.h);
+        paintTurn(ctx, asPrint(images[card.i]), null, card.rot, card.x + card.w / 2, card.y + card.h / 2, card.w, card.h);
       }
     }
 
     function drawPile(ctx, images, t) {
       var items = pileLayout(images.length, t);
       var i;
-      for (i = 0; i < items.length; i += 1) paintPrint(ctx, images[items[i].i], items[i]);
+      for (i = 0; i < items.length; i += 1) {
+        var item = items[i];
+        paintFloorShadow(ctx, item.cx - item.w / 2, item.cy - item.h / 2, item.w, item.h);
+        paintPrint(ctx, asPrint(images[item.i]), item);
+      }
     }
 
     function drawFlip(ctx, images, t) {
@@ -1079,7 +1187,8 @@
       var front = images[st.front];
       var back = images[Math.min(images.length - 1, st.back)];
       if (images.length < 2) back = null;
-      paintTurn(ctx, front, back, st.angle, W / 2, H / 2, 696, 1504);
+      paintFloorShadow(ctx, 148, 268, 424, 900);
+      paintTurn(ctx, asPrint(front), asPrint(back), st.angle, 360, 718, 424, 900);
     }
 
     function drawFan(ctx, images, t) {
@@ -1090,10 +1199,11 @@
         var card = order[i];
         if (!images[card.i]) continue;
         if (card.y > H + 10 || card.y + card.h < -10) continue;
+        paintFloorShadow(ctx, card.x, card.y, card.w, card.h);
         ctx.save();
         ctx.translate(card.x + card.w / 2, card.y + card.h / 2);
         ctx.rotate(card.rotZ || 0);
-        paintTurn(ctx, images[card.i], null, card.rot || 0, 0, 0, card.w, card.h);
+        paintTurn(ctx, asPrint(images[card.i]), null, card.rot || 0, 0, 0, card.w, card.h);
         ctx.restore();
       }
     }
@@ -1224,8 +1334,10 @@
       camera.fov = CUBE.fov;
       camera.minZ = 0.01;
       camera.maxZ = 80;
-      camera.lowerRadiusLimit = camZ * 0.6;
-      camera.upperRadiusLimit = camZ * 3.2;
+      camera.lowerRadiusLimit = 2;
+      camera.upperRadiusLimit = 9;
+      camera.lowerBetaLimit = 0.65;
+      camera.upperBetaLimit = 1.5;
       scene.activeCamera = camera;
       var face = cubeFaceSize();
       var box = B.MeshBuilder.CreateBox("큐브", { width: face.faceW, height: face.faceH, depth: face.faceW }, scene);
@@ -1260,6 +1372,79 @@
       rimMat.albedoColor = new B.Color3(0.05, 0.04, 0.035);
       rim.material = rimMat;
       rim.isVisible = false;
+      box.isVisible = false;
+      function stockMat(name) {
+        var mat = new B.StandardMaterial(name, scene);
+        mat.diffuseColor = new B.Color3(0.78, 0.74, 0.68);
+        mat.specularColor = new B.Color3(0.1, 0.09, 0.08);
+        return mat;
+      }
+      function makePrint(name, w, h) {
+        var mesh = B.MeshBuilder.CreateBox(name, { width: w, height: h, depth: 0.05 }, scene);
+        var multi = new B.MultiMaterial(name + "mm", scene);
+        var mats = [];
+        var fi;
+        for (fi = 0; fi < 6; fi += 1) {
+          var mat = new B.PBRMaterial(name + "f" + fi, scene);
+          mat.unlit = true;
+          mat.albedoColor = fi === 2 ? new B.Color3(0.62, 0.56, 0.48) : new B.Color3(0.28, 0.24, 0.2);
+          mat.backFaceCulling = false;
+          mat.metallic = 0;
+          mat.roughness = 1;
+          mats.push(mat);
+          multi.subMaterials.push(mat);
+        }
+        mesh.subMeshes = [];
+        if (mesh.getTotalVertices() === 24 && mesh.getTotalIndices() === 36) {
+          for (fi = 0; fi < 6; fi += 1) new B.SubMesh(fi, fi * 4, 4, fi * 6, 6, mesh);
+        }
+        mesh.material = multi;
+        mesh.isPickable = false;
+        return { mesh: mesh, mats: mats };
+      }
+      var wall = B.MeshBuilder.CreatePlane("wall", { width: 14, height: 12 }, scene);
+      wall.position.set(0, 0.7, 2.2);
+      wall.rotation.y = Math.PI;
+      var wallMat = new B.PBRMaterial("wallMat", scene);
+      wallMat.unlit = true;
+      wallMat.backFaceCulling = false;
+      wall.material = wallMat;
+      var floor = B.MeshBuilder.CreatePlane("floor", { width: 14, height: 12 }, scene);
+      floor.rotation.x = Math.PI / 2;
+      floor.position.set(0, -0.84, 0.2);
+      var floorMat = new B.PBRMaterial("floorMat", scene);
+      floorMat.unlit = true;
+      floorMat.backFaceCulling = false;
+      floor.material = floorMat;
+      var trim = B.MeshBuilder.CreateBox("trim", { width: 14, height: 0.1, depth: 0.18 }, scene);
+      trim.position.set(0, -0.78, 2.08);
+      var trimMat = stockMat("trimMat");
+      trim.material = trimMat;
+      var cardA = makePrint("cardA", 0.98, 1.84);
+      cardA.mesh.position.set(0.22, 0.1, 0);
+      var cardB = makePrint("cardB", 0.74, 1.4);
+      cardB.mesh.position.set(-0.5, 0.18, 0.78);
+      cardB.mesh.rotation.y = 0.38;
+      function shadowPad(name, x, z, w) {
+        var pad = B.MeshBuilder.CreateGround(name, { width: w, height: 0.22 }, scene);
+        pad.position.set(x, -0.82, z);
+        var mat = new B.StandardMaterial(name + "m", scene);
+        mat.diffuseColor = new B.Color3(0, 0, 0);
+        mat.specularColor = new B.Color3(0, 0, 0);
+        mat.alpha = 0.42;
+        pad.material = mat;
+        pad.isPickable = false;
+        return pad;
+      }
+      var shadeA = shadowPad("shadeA", 0.22, -0.2, 0.82);
+      var shadeB = shadowPad("shadeB", -0.5, 0.55, 0.58);
+      var key = new B.DirectionalLight("key", new B.Vector3(0.42, -1, 0.38), scene);
+      key.intensity = 1.3;
+      key.diffuse = new B.Color3(1, 0.95, 0.88);
+      var fill = new B.HemisphericLight("fill", new B.Vector3(0, 1, 0), scene);
+      fill.intensity = 0.34;
+      fill.diffuse = new B.Color3(1, 0.96, 0.9);
+      fill.groundColor = new B.Color3(0.16, 0.13, 0.11);
       var circle = document.createElement("canvas");
       circle.width = 64;
       circle.height = 64;
@@ -1302,11 +1487,26 @@
         motes: motes,
         endPlane: endPlane,
         endMat: endMat,
+        endBaseW: visW,
+        endBaseH: visH,
         endKey: "",
         texKey: "",
         photoTex: [],
         camZ: camZ,
-        rim: rim
+        rim: rim,
+        wall: wall,
+        wallMat: wallMat,
+        floor: floor,
+        floorMat: floorMat,
+        trim: trim,
+        trimMat: trimMat,
+        cardA: cardA,
+        cardB: cardB,
+        shadeA: shadeA,
+        shadeB: shadeB,
+        roomKey: "",
+        texA: null,
+        texB: null
       };
       return cubeState;
     }
@@ -1348,12 +1548,41 @@
       showFace(FACE_SIDE, Math.sin(st.angle) > 0.5);
     }
 
+    function gradientTex(c0, c1) {
+      var c = document.createElement("canvas");
+      c.width = 32;
+      c.height = 256;
+      var g = c.getContext("2d");
+      var grd = g.createLinearGradient(0, 0, 16, 256);
+      grd.addColorStop(0, c0);
+      grd.addColorStop(1, c1);
+      g.fillStyle = grd;
+      g.fillRect(0, 0, 32, 256);
+      return putTexture(cubeState.scene, c, false);
+    }
+
+    function applyRoom(bg) {
+      if (cubeState.roomKey === bg) return;
+      var tone = roomTones(bg);
+      cubeState.wallMat.albedoTexture = gradientTex(tone.wall0, tone.wall1);
+      cubeState.floorMat.albedoTexture = gradientTex(tone.floor0, tone.floor1);
+      cubeState.scene.clearColor = hexColor(tone.wall1);
+      cubeState.roomKey = bg;
+    }
+
+    function setPrint(card, img) {
+      var mat = card.mats[FACE_FRONT];
+      mat.unlit = true;
+      if (!img) {
+        mat.albedoTexture = null;
+        mat.albedoColor = new BABYLON.Color3(0.84, 0.8, 0.74);
+        return;
+      }
+      mat.albedoTexture = putTexture(cubeState.scene, asPrint(img), true);
+      mat.albedoColor = new BABYLON.Color3(1, 1, 1);
+    }
+
     function placeMotes(kind, t, bg) {
-      var cam = cubeState.scene.activeCamera.position;
-      var z = -(cubeFaceSize().faceW / 2) - 0.04;
-      var dist = Math.abs(cam.z - z);
-      var visH = 2 * dist * Math.tan(cubeState.scene.activeCamera.fov / 2);
-      var visW = visH * (W / H);
       var i;
       for (i = 0; i < cubeState.motes.length; i += 1) {
         var mote = cubeState.motes[i];
@@ -1363,15 +1592,42 @@
           continue;
         }
         mote.isVisible = true;
-        mote.position.x = (p.x / W - 0.5) * visW;
-        mote.position.y = (0.5 - p.y / H) * visH;
-        mote.position.z = z;
-        var world = (p.r * 2 / H) * visH;
-        mote.width = world;
-        mote.height = world;
+        mote.position.x = (p.x / W - 0.5) * 3.2;
+        mote.position.y = 1.55 + (1 - p.y / 220) * 0.7;
+        mote.position.z = 1.7;
+        mote.width = 0.035 + (p.r / 20) * 0.05;
+        mote.height = mote.width;
         var parts = p.rgb.split(",");
-        mote.color = new BABYLON.Color4(Number(parts[0]) / 255, Number(parts[1]) / 255, Number(parts[2]) / 255, p.a);
+        mote.color = new BABYLON.Color4(Number(parts[0]) / 255, Number(parts[1]) / 255, Number(parts[2]) / 255, p.a * 0.7);
       }
+    }
+
+    function setRoomVisible(on) {
+      cubeState.wall.isVisible = on;
+      cubeState.floor.isVisible = on;
+      cubeState.trim.isVisible = on;
+      cubeState.cardA.mesh.isVisible = on;
+      cubeState.cardB.mesh.isVisible = on;
+      cubeState.shadeA.isVisible = on;
+      cubeState.shadeB.isVisible = on;
+      cubeState.box.isVisible = false;
+      if (cubeState.rim) cubeState.rim.isVisible = false;
+    }
+
+    function shotPose(angle) {
+      var p = angle / (Math.PI / 2);
+      if (p < 0) p = 0;
+      if (p > 1) p = 1;
+      var mid = Math.sin(p * Math.PI);
+      return {
+        alpha: -Math.PI / 2 + mixNum(0.02, -0.06, p) + mid * 0.7,
+        beta: mixNum(1.42, 1.38, p) - mid * 0.08,
+        radius: mixNum(4.85, 6.9, p) + mid * 0.35,
+        tx: mixNum(0.22, -0.12, p),
+        ty: mixNum(0.12, 0.16, p) - mid * 0.12,
+        tz: mixNum(0.0, 0.62, p),
+        yaw: mid * 0.5
+      };
     }
 
     function showCubeEnd(who) {
@@ -1383,9 +1639,22 @@
         cubeState.endMat.albedoTexture = putTexture(cubeState.scene, paint, true);
         cubeState.endKey = who;
       }
+      setRoomVisible(false);
+      var cam = cubeState.scene.activeCamera;
+      cam.alpha = -Math.PI / 2;
+      cam.beta = Math.PI / 2;
+      cam.radius = 4.2;
+      cam.fov = 0.7;
+      cam.setTarget(new BABYLON.Vector3(0, 0, 0));
+      cubeState.scene.clearColor = hexColor("#0D1928");
+      var dist = 2.4;
+      var visH = 2 * dist * Math.tan(cam.fov / 2) * 1.02;
+      var visW = visH * (W / H);
+      cubeState.endPlane.rotation.y = Math.PI;
+      cubeState.endPlane.scaling.x = visW / cubeState.endBaseW;
+      cubeState.endPlane.scaling.y = visH / cubeState.endBaseH;
+      cubeState.endPlane.position.set(0, 0, cam.position.z + dist);
       cubeState.endPlane.isVisible = true;
-      cubeState.box.isVisible = false;
-      if (cubeState.rim) cubeState.rim.isVisible = false;
       var i;
       for (i = 0; i < cubeState.motes.length; i += 1) cubeState.motes[i].isVisible = false;
     }
@@ -1393,22 +1662,35 @@
     function renderCube(images, t, bg, kind, who, body) {
       if (!ensureCube()) return false;
       if (cubeState.gl.width !== W || cubeState.gl.height !== H) cubeState.engine.setSize(W, H);
-      cubeState.scene.clearColor = hexColor(bg);
+      applyRoom(bg);
       var ending = !!(who && t >= body);
       if (ending) {
         showCubeEnd(who);
       } else {
         cubeState.endPlane.isVisible = false;
-        cubeState.box.isVisible = true;
+        setRoomVisible(true);
+        if (images.length < 2) cubeState.cardB.mesh.isVisible = false;
+        if (cubeState.texA !== images[0] || cubeState.texB !== (images[1] || null)) {
+          setPrint(cubeState.cardA, images[0]);
+          setPrint(cubeState.cardB, images.length > 1 ? images[1] : null);
+          cubeState.texA = images[0];
+          cubeState.texB = images[1] || null;
+        }
         var st = cubeView(images.length, t);
-        assignCubeFaces(st, images);
-        cubeState.box.rotation.y = CUBE_Y_SIGN * st.angle;
-        var open = Math.sin(Math.min(st.angle, Math.PI / 2) * 2);
-        if (open < 0) open = 0;
+        var pose = shotPose(st.angle);
         var cam = cubeState.scene.activeCamera;
-        cam.radius = cubeState.camZ * (1 + 0.16 * open);
-        cam.fov = CUBE.fov + 0.1 * open;
-        if (cubeState.rim) cubeState.rim.isVisible = open > 0.42;
+        cam.fov = CUBE.fov;
+        cam.alpha = pose.alpha;
+        cam.beta = pose.beta;
+        cam.radius = pose.radius;
+        cam.setTarget(new BABYLON.Vector3(pose.tx, pose.ty, pose.tz));
+        cubeState.cardA.mesh.rotation.y = pose.yaw;
+        var ap = cubeState.cardA.mesh.position;
+        cubeState.shadeA.position.set(ap.x + Math.sin(pose.yaw) * 0.06, -0.82, ap.z - 0.16);
+        cubeState.shadeA.rotation.y = pose.yaw;
+        var bp = cubeState.cardB.mesh.position;
+        cubeState.shadeB.position.set(bp.x, -0.82, bp.z - 0.12);
+        cubeState.shadeB.isVisible = images.length > 1;
         placeMotes(kind, t, bg);
       }
       cubeState.scene.render();
@@ -1436,13 +1718,13 @@
       }
       var time = t;
       if (!who && t > body) time = body;
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, W, H);
+      paintRoom(ctx, bg);
+      drawParticles(ctx, kind, time, bg);
+      paintMat(ctx, roomTones(bg), rearImage(look, images, time));
       if (look === "pile") drawPile(ctx, images, time);
       else if (look === "flip") drawFlip(ctx, images, time);
       else if (look === "fan") drawFan(ctx, images, time);
       else drawStand(ctx, images, time);
-      drawParticles(ctx, kind, time, bg);
     }
 
     var mboxMotion = {
@@ -1485,11 +1767,11 @@
       var userImages = null;
       var facesReady = false;
       var CLIPS = {
-        cards: "template-previews/stand-faces.mp4?v=20261027f",
-        pile: "template-previews/pile-faces.mp4?v=20261027f",
-        flip: "template-previews/flip-faces.mp4?v=20261027f",
-        fan: "template-previews/fan-faces.mp4?v=20261027f",
-        cube: "template-previews/cube-faces.mp4?v=20261027f"
+        cards: "template-previews/stand-faces.mp4?v=20261027g",
+        pile: "template-previews/pile-faces.mp4?v=20261027g",
+        flip: "template-previews/flip-faces.mp4?v=20261027g",
+        fan: "template-previews/fan-faces.mp4?v=20261027g",
+        cube: "template-previews/cube-faces.mp4?v=20261027g"
       };
 
       function setStatus(text) { note.textContent = text; }
