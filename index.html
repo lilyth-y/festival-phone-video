@@ -144,7 +144,7 @@
       background: #000;
     }
     .shelf label.on .frame { box-shadow: inset 0 0 0 3px #B89047; }
-    .shelf video {
+    .shelf video, .shelf img {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -326,35 +326,35 @@
       <p class="aside">사진은 이 폰 안에만 있습니다. 소리 없는 세로 영상이고, 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다.</p>
     </div>
     <div id="player" class="player">
-      <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/stand-faces.mp4?v=20261027d"></video>
+      <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-faces.mp4?v=20261027e"></video>
       <canvas id="stage" width="720" height="1560"></canvas>
     </div>
     <fieldset class="shelf">
       <legend>모습</legend>
       <label class="on">
-        <input type="radio" name="look" value="cards" checked>
-        <span class="frame"><video muted loop playsinline autoplay preload="auto" src="template-previews/stand-faces.mp4?v=20261027d"></video></span>
-        <strong>세운 카드</strong><em>다음 카드가 옆에서 들어와 앞을 차지합니다.</em>
+        <input type="radio" name="look" value="cube" checked>
+        <span class="frame"><img alt="" src="template-previews/cube-poster.jpg?v=20261027e"></span>
+        <strong>큐브</strong><em>가까운 큐브가 한 번 돌아 다음 얼굴을 보여 줍니다.</em>
+      </label>
+      <label>
+        <input type="radio" name="look" value="cards">
+        <span class="frame"><img alt="" src="template-previews/stand-poster.jpg?v=20261027e"></span>
+        <strong>세운 카드</strong><em>두 얼굴이 나란히 선 뒤 새 카드가 앞을 차지합니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="pile">
-        <span class="frame"><video muted loop playsinline autoplay preload="auto" src="template-previews/pile-faces.mp4?v=20261027d"></video></span>
+        <span class="frame"><img alt="" src="template-previews/pile-poster.jpg?v=20261027e"></span>
         <strong>포개기</strong><em>다음 인화가 위에서 떨어져 겹칩니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="flip">
-        <span class="frame"><video muted loop playsinline autoplay preload="auto" src="template-previews/flip-faces.mp4?v=20261027d"></video></span>
+        <span class="frame"><img alt="" src="template-previews/flip-poster.jpg?v=20261027e"></span>
         <strong>뒤집기</strong><em>큰 카드가 돌려져 다음 얼굴을 보여 줍니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="fan">
-        <span class="frame"><video muted loop playsinline autoplay preload="auto" src="template-previews/fan-faces.mp4?v=20261027d"></video></span>
+        <span class="frame"><img alt="" src="template-previews/fan-poster.jpg?v=20261027e"></span>
         <strong>붙여 오르기</strong><em>카드가 올라오며 여러 얼굴이 펼쳐집니다.</em>
-      </label>
-      <label>
-        <input type="radio" name="look" value="cube">
-        <span class="frame"><video muted loop playsinline autoplay preload="auto" src="template-previews/cube-faces.mp4?v=20261027d"></video></span>
-        <strong>큐브</strong><em>가까운 큐브가 한 번 돌아 다음 얼굴을 보여 줍니다.</em>
       </label>
     </fieldset>
     <p class="cap">예시 영상 · 손님 사진 아님</p>
@@ -396,11 +396,11 @@
     var H = 1560;
     var END = 1.6;
     var PREVIEW = 2.5;
-    var STAND = { lead: 0.22, travel: 1.4, settle: 0.55, rest: 0.2 };
+    var STAND = { lead: 0.22, travel: 0.42, settle: 0.7, rest: 0.55 };
     var PILE = { lead: 0.22, fall: 1.35, settle: 0.5, rest: 0.25, margin: 32, overshoot: 20 };
     var FLIP = { lead: 0.15, spin: 2.2, rest: 0.25 };
     var FAN = { lead: 0.35, rise: 1.4, hold: 0.45, tuck: 0.4, rest: 0.12 };
-    var CUBE = { lead: 0.25, turn: 1.7, hold: 0.4, rest: 0.2, size: 2, fov: 0.52, pad: 1.08 };
+    var CUBE = { lead: 0.25, turn: 1.22, hold: 0.55, rest: 0.2, size: 2, fov: 0.52, pad: 1.08, corner: 0.78 };
     var CUBE_Y_SIGN = 1;
     var FACE_FRONT = 1;
     var FACE_SIDE = 2;
@@ -457,10 +457,12 @@
     }
 
     function standIdle(i) { return { i: i, x: 16, y: 22, w: 688, h: 1516, rot: -0.08, rotZ: 0 }; }
-    function standFront(i) { return { i: i, x: 176, y: 36, w: 524, h: 1484, rot: -0.07, rotZ: 0 }; }
-    function standPeek(i) { return { i: i, x: 8, y: 58, w: 520, h: 1440, rot: 0.16, rotZ: 0 }; }
-    function standEnter(i) { return { i: i, x: 860, y: 30, w: 620, h: 1500, rot: 0.72, rotZ: 0 }; }
-    function standGone(i) { return { i: i, x: -720, y: 80, w: 480, h: 1300, rot: 0.2, rotZ: 0 }; }
+    function standPairLeft(i) { return { i: i, x: 18, y: 70, w: 330, h: 1420, rot: 0.05, rotZ: 0 }; }
+    function standPairRight(i) { return { i: i, x: 372, y: 36, w: 330, h: 1464, rot: -0.04, rotZ: 0 }; }
+    function standOff(i) { return { i: i, x: 760, y: 36, w: 330, h: 1464, rot: -0.04, rotZ: 0 }; }
+    function cardInside(card) {
+      return card.x >= -2 && card.y >= -2 && card.x + card.w <= W + 2 && card.y + card.h <= H + 2;
+    }
 
     function standLayout(n, t) {
       if (n <= 1) return [standIdle(0)];
@@ -469,29 +471,30 @@
       if (local0 < 0) return [standIdle(0)];
       var step = Math.min(n - 2, Math.floor(Math.max(0, local0) / slot));
       var u = local0 - step * slot;
-      var travelP = u < STAND.travel ? easeOutCubic(u / STAND.travel) : 1;
-      var settleP = 0;
-      if (u >= STAND.travel && u < STAND.travel + STAND.settle) settleP = smooth((u - STAND.travel) / STAND.settle);
-      else if (u >= STAND.travel + STAND.settle) settleP = 1;
-      var incoming = standEnter(step + 1);
-      var landed = standFront(step + 1);
-      var over = {
-        i: step + 1,
-        x: landed.x - 28,
-        y: landed.y + 18,
-        w: landed.w,
-        h: landed.h,
-        rot: landed.rot - 0.04,
-        rotZ: 0
-      };
-      var frontCard = settleP > 0 ? mixCard(over, landed, settleP) : mixCard(incoming, over, travelP);
-      var from = step === 0 ? standIdle(step) : standFront(step);
-      var prevCard = mixCard(from, standPeek(step), travelP);
+      var oldI = step;
+      var newI = step + 1;
       var cards = [];
-      if (step >= 1) cards.push(mixCard(standPeek(step - 1), standGone(step - 1), travelP));
-      cards.push(prevCard);
-      cards.push(frontCard);
-      return cards;
+      if (u < STAND.travel) {
+        var p = easeOutCubic(u / STAND.travel);
+        var oldCard = mixCard(standIdle(oldI), standPairLeft(oldI), p);
+        var neu = mixCard(standOff(newI), standPairRight(newI), p);
+        if (cardInside(oldCard)) cards.push(oldCard);
+        if (cardInside(neu)) cards.push(neu);
+        if (!cards.length) cards.push(standIdle(oldI));
+        return cards;
+      }
+      if (u < STAND.travel + STAND.settle) return [standPairLeft(oldI), standPairRight(newI)];
+      var take = 0.28;
+      var restStart = STAND.travel + STAND.settle;
+      if (u < restStart + take) {
+        var p2 = smooth((u - restStart) / take);
+        var winner = mixCard(standPairRight(newI), standIdle(newI), p2);
+        if (p2 < 0.2 && cardInside(standPairLeft(oldI))) cards.push(standPairLeft(oldI));
+        if (cardInside(winner)) cards.push(winner);
+        if (!cards.length) cards.push(standIdle(newI));
+        return cards;
+      }
+      return [standIdle(newI)];
     }
 
     function pileRest(i) {
@@ -596,8 +599,17 @@
       if (local < 0) return { angle: 0, front: 0, side: 1 };
       var step = Math.min(n - 2, Math.floor(local / slot));
       var u = local - step * slot;
-      var p = u >= CUBE.turn ? 1 : easeInOut(u / CUBE.turn);
-      return { angle: p * Math.PI / 2, front: step, side: step + 1 };
+      var corner = CUBE.corner;
+      var sweepIn = 0.22;
+      var holdCorner = 0.72;
+      var sweepOut = 0.28;
+      var angle = Math.PI / 2;
+      if (u < sweepIn) angle = smooth(u / sweepIn) * corner;
+      else if (u < sweepIn + holdCorner) angle = corner;
+      else if (u < sweepIn + holdCorner + sweepOut) {
+        angle = corner + smooth((u - sweepIn - holdCorner) / sweepOut) * (Math.PI / 2 - corner);
+      }
+      return { angle: angle, front: step, side: step + 1 };
     }
 
     function countVisible(cards) {
@@ -618,10 +630,11 @@
       var s0 = standLayout(2, 0.2);
       var s1 = standLayout(2, 2.0);
       check(countVisible(s0) === 1, "0.2초 세운 카드가 한 장이 아님");
-      check(countVisible(s1) >= 2, "2.0초 세운 카드에 두 번째가 없음");
-      check(s0[0].x > 0 && s0[0].y > 0 && s0[0].x + s0[0].w <= W && s0[0].y + s0[0].h <= H, "쉬는 카드가 화면 밖으로 잘림");
-      check(Math.abs(s1[s1.length - 1].x - 860) > 500, "새 카드가 거의 안 들어옴");
-      check(Math.abs(s1[s1.length - 1].x - s0[0].x) > 80, "앞 카드가 10px만 움직임");
+      check(cardInside(s0[0]) && s0[0].i === 0, "0.2초 세운 카드가 잘림");
+      var sMid = standLayout(2, 1.0);
+      check(sMid.length === 2 && cardInside(sMid[0]) && cardInside(sMid[1]) && sMid[0].i !== sMid[1].i, "1초 세운 카드가 반쪽 얼굴");
+      check(s1.length === 1 && s1[0].i === 1 && cardInside(s1[0]), "2초 세운 카드가 반쪽 얼굴");
+      check(Math.abs(s1[0].w - standIdle(1).w) < 2, "2초 세운 카드가 가득 차지 않음");
       var p0 = pileLayout(2, 0.2);
       var p1 = pileLayout(2, 1.0);
       var p2 = pileLayout(2, 2.0);
@@ -643,8 +656,10 @@
       for (ai = 0; ai < a1.length; ai += 1) spread = Math.max(spread, Math.abs(a1[ai].rotZ || 0));
       check(spread > 0.25, "붙여 오르기가 펼쳐지지 않음");
       var c0 = cubeView(2, 0.2);
+      var cMid = cubeView(2, 1.0);
       var c1 = cubeView(2, 2.0);
       check(c0.angle === 0 && c0.front === 0, "0.2초 큐브가 정면이 아님");
+      check(Math.abs(cMid.angle - CUBE.corner) < 0.02 && cMid.side === 1, "1초 큐브가 모서리가 아님");
       check(Math.abs(c1.angle - Math.PI / 2) < 0.001 && c1.side === 1, "2.0초 큐브가 90도 정면이 아님");
       check(bodySeconds(6, "cards") + END < 20, "세운 카드 6장이 20초를 넘음");
       check(bodySeconds(6, "pile") + END < 20, "포개기 6장이 20초를 넘음");
@@ -995,7 +1010,7 @@
       var i;
       for (i = 0; i < cards.length; i += 1) {
         var card = cards[i];
-        if (card.x > W || card.x + card.w < 0) continue;
+        if (!cardInside(card)) continue;
         paintTurn(ctx, images[card.i], null, card.rot, card.x + card.w / 2, card.y + card.h / 2, card.w, card.h);
       }
     }
@@ -1226,6 +1241,7 @@
         endMat: endMat,
         endKey: "",
         texKey: "",
+        photoTex: [],
         camZ: camZ
       };
       return cubeState;
@@ -1244,15 +1260,27 @@
           cubeState.mats[f].albedoTexture = null;
           cubeState.mats[f].albedoColor = new BABYLON.Color3(0, 0, 0);
         }
-        cubeState.mats[FACE_FRONT].albedoColor = new BABYLON.Color3(1, 1, 1);
-        cubeState.mats[FACE_FRONT].albedoTexture = putTexture(cubeState.scene, faceCanvas(images[st.front]), true);
-        if (images[st.side] && st.side !== st.front) {
-          cubeState.mats[FACE_SIDE].albedoColor = new BABYLON.Color3(1, 1, 1);
-          cubeState.mats[FACE_SIDE].albedoTexture = putTexture(cubeState.scene, faceCanvas(images[st.side]), "cw");
-        }
+        cubeState.photoTex[FACE_FRONT] = putTexture(cubeState.scene, faceCanvas(images[st.front]), true);
+        cubeState.photoTex[FACE_SIDE] = images[st.side] && st.side !== st.front
+          ? putTexture(cubeState.scene, faceCanvas(images[st.side]), "cw")
+          : null;
         cubeState.box.material = cubeState.multi;
         cubeState.texKey = key;
       }
+      var bgRgb = hexColor(currentBg());
+      var stageColor = new BABYLON.Color3(bgRgb.r, bgRgb.g, bgRgb.b);
+      function showFace(index, visible) {
+        var mat = cubeState.mats[index];
+        if (visible && cubeState.photoTex[index]) {
+          mat.albedoColor = new BABYLON.Color3(1, 1, 1);
+          mat.albedoTexture = cubeState.photoTex[index];
+        } else {
+          mat.albedoTexture = null;
+          mat.albedoColor = stageColor;
+        }
+      }
+      showFace(FACE_FRONT, Math.cos(st.angle) > 0.62);
+      showFace(FACE_SIDE, Math.sin(st.angle) > 0.5);
     }
 
     function placeMotes(kind, t, bg) {
@@ -1385,11 +1413,11 @@
       var userImages = null;
       var facesReady = false;
       var CLIPS = {
-        cards: "template-previews/stand-faces.mp4?v=20261027d",
-        pile: "template-previews/pile-faces.mp4?v=20261027d",
-        flip: "template-previews/flip-faces.mp4?v=20261027d",
-        fan: "template-previews/fan-faces.mp4?v=20261027d",
-        cube: "template-previews/cube-faces.mp4?v=20261027d"
+        cards: "template-previews/stand-faces.mp4?v=20261027e",
+        pile: "template-previews/pile-faces.mp4?v=20261027e",
+        flip: "template-previews/flip-faces.mp4?v=20261027e",
+        fan: "template-previews/fan-faces.mp4?v=20261027e",
+        cube: "template-previews/cube-faces.mp4?v=20261027e"
       };
 
       function setStatus(text) { note.textContent = text; }
@@ -1422,6 +1450,11 @@
           }
         }
         playerVideo.style.visibility = el ? "hidden" : "visible";
+        if (el) playerVideo.pause();
+        else {
+          var again = playerVideo.play();
+          if (again && again.catch) again.catch(function () {});
+        }
       }
 
       function markLook() {
