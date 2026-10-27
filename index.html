@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F5F3EE">
+  <title>한신 AI·SW 페스티벌 폰 영상</title>
+  <style>
+    @font-face {
+      font-family: "Pretendard";
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url("fonts/Pretendard-Medium.subset.woff2") format("woff2");
+    }
+    @font-face {
+      font-family: "Pretendard";
+      font-style: normal;
+      font-weight: 700;
+      font-display: swap;
+      src: url("fonts/Pretendard-Bold.subset.woff2") format("woff2");
+    }
+    @font-face {
+      font-family: "Pretendard";
+      font-style: normal;
+      font-weight: 800;
+      font-display: swap;
+      src: url("fonts/Pretendard-ExtraBold.subset.woff2") format("woff2");
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      overflow-x: hidden;
+      background: #F5F3EE;
+      color: #18181B;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      word-break: keep-all;
+    }
+    main {
+      width: min(480px, 100%);
+      margin: 0 auto;
+      padding: 28px 20px 32px;
+    }
+    .kicker {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #78716C;
+    }
+    h1 {
+      margin: 0 0 18px;
+      font-size: 34px;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: -0.045em;
+    }
+    .card {
+      background: #fff;
+      border-radius: 22px;
+      padding: 18px 18px 16px;
+      margin: 0 0 12px;
+    }
+    .card p { margin: 0; font-size: 16px; line-height: 1.5; color: #44403C; }
+    .brand { margin: 0 0 12px; }
+    .brand b {
+      display: inline-block;
+      color: #0D1928;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+    }
+    .brand i {
+      display: block;
+      width: 4.8em;
+      height: 3px;
+      margin-top: 6px;
+      background: #B89047;
+    }
+    .who {
+      display: block;
+      margin-top: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #44403C;
+    }
+    .who input {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 14px 12px;
+      border: 0;
+      border-radius: 14px;
+      background: #F5F3EE;
+      color: #18181B;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .shelf {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 14px 0 0;
+      padding: 0;
+      border: 0;
+    }
+    .shelf legend {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+    .shelf label {
+      position: relative;
+      display: block;
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 16px;
+      background: #0D1928;
+      color: #fff;
+    }
+    .shelf label.on { border-color: #B89047; }
+    .shelf input { position: absolute; opacity: 0; }
+    .shelf video {
+      display: block;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      object-fit: cover;
+      background: #0D1928;
+    }
+    .shelf span { display: block; padding: 8px 10px 10px; }
+    .shelf strong { display: block; font-size: 15px; font-weight: 800; }
+    .shelf em {
+      display: block;
+      margin-top: 2px;
+      font-style: normal;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.35;
+      color: #D6D3D1;
+    }
+    button.primary, a.primary {
+      display: block;
+      width: 100%;
+      margin-top: 14px;
+      padding: 16px 18px;
+      border: 0;
+      border-radius: 16px;
+      background: #18181B;
+      color: #fff;
+      text-align: center;
+      text-decoration: none;
+      font: inherit;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    button.primary:disabled { opacity: 0.45; }
+    .file {
+      display: block;
+      margin-top: 14px;
+      padding: 14px 12px;
+      border-radius: 14px;
+      background: #F5F3EE;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 800;
+    }
+    #photos {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+    }
+    #picked {
+      margin: 8px 0 0;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #44403C;
+    }
+    #reel {
+      width: min(240px, 72%);
+      display: block;
+      margin: 14px auto 0;
+      border-radius: 16px;
+      background: #0D1928;
+    }
+    #handoff[hidden] { display: none; }
+    a.quiet {
+      display: block;
+      margin-top: 8px;
+      color: #44403C;
+      text-align: center;
+      text-decoration: underline;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .cap {
+      margin: 6px 0 0;
+      text-align: center;
+      font-size: 12px;
+      color: #78716C;
+    }
+    #status { margin: 10px 0 0; font-size: 14px; line-height: 1.45; color: #44403C; }
+    .fine {
+      margin: 14px 2px 0;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #78716C;
+    }
+    #stage {
+      position: fixed;
+      left: -4000px;
+      top: 0;
+      width: 720px;
+      height: 1280px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="kicker">2026 한신 AI·SW 페스티벌</p>
+    <h1>같이 온 사람에게</h1>
+    <section class="card">
+      <p class="brand"><b>MBOX</b><i></i></p>
+      <p>이 폰의 사진으로 소리 없는 세로 영상을 만듭니다. 사진은 이 폰 안에만 있고, 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다.</p>
+      <label class="who">보여주는 사람
+        <input id="forName" maxlength="16" placeholder="이름. 비워 두면 같이 온 사람" autocomplete="off">
+      </label>
+      <fieldset class="shelf">
+        <legend>템플릿</legend>
+        <label class="on">
+          <input type="radio" name="look" value="still" checked>
+          <video muted loop playsinline autoplay src="template-previews/still.mp4"></video>
+          <span><strong>잔잔</strong><em>사진이 천천히 겹칩니다.</em></span>
+        </label>
+        <label>
+          <input type="radio" name="look" value="turn">
+          <video muted loop playsinline autoplay src="template-previews/turn.mp4"></video>
+          <span><strong>넘기기</strong><em>다음 장면이 옆으로 들어옵니다.</em></span>
+        </label>
+        <label>
+          <input type="radio" name="look" value="warm">
+          <video muted loop playsinline autoplay src="template-previews/warm.mp4"></video>
+          <span><strong>불빛</strong><em>같은 움직임에 따뜻한 색만 올립니다.</em></span>
+        </label>
+        <label>
+          <input type="radio" name="look" value="sweep">
+          <video muted loop playsinline autoplay src="template-previews/sweep.mp4"></video>
+          <span><strong>빛줄기</strong><em>사진 위를 빛이 한 번 지나갑니다.</em></span>
+        </label>
+      </fieldset>
+      <p class="cap">예시 영상 · 손님 사진 아님</p>
+      <label class="file" for="photos">사진 고르기</label>
+      <input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+      <p id="picked"></p>
+      <button id="make" class="primary" type="button">영상 만들기</button>
+      <p id="status" role="status"></p>
+      <div id="handoff" hidden>
+        <video id="reel" controls playsinline></video>
+        <button id="send" class="primary" type="button">이 사람에게 보내기</button>
+        <a id="keep" class="quiet">이 폰에 저장</a>
+      </div>
+    </section>
+    <p class="fine">곰은 부스 홀로그램에 있습니다. 이 페이지로는 곰이 움직이지 않습니다. 노래는 들어 있지 않습니다. 만든 파일은 이 폰에 남습니다.</p>
+  </main>
+  <canvas id="stage" width="720" height="1280"></canvas>
+  <script>
+    var HOLD = 1.6;
+    var SLIDE = 0.35;
+    var W = 720;
+    var H = 1280;
+    var BAND = 220;
+    var END = 1.6;
+
+    function cardLine(raw) {
+      var text = String(raw == null ? "" : raw).split(/\s+/).join(" ").trim();
+      var kept = [];
+      var i;
+      for (i = 0; i < text.length; i += 1) {
+        var ch = text.charAt(i);
+        var code = ch.charCodeAt(0);
+        var hangul = code >= 0xAC00 && code <= 0xD7A3;
+        var latin = (ch >= "A" && ch <= "Z") || (ch >= "a" && ch <= "z");
+        var digit = ch >= "0" && ch <= "9";
+        if (ch === " " || hangul || latin || digit) kept.push(ch);
+      }
+      var name = kept.join("").trim().slice(0, 16);
+      if (!name) return "같이 온 사람에게";
+      var compact = name.split(" ").join("");
+      var allHangul = compact.length > 0;
+      for (i = 0; i < compact.length; i += 1) {
+        var c = compact.charCodeAt(i);
+        if (c < 0xAC00 || c > 0xD7A3) allHangul = false;
+      }
+      if (allHangul && name.slice(-2) !== "에게") return name + "에게";
+      return name;
+    }
+
+    function bodySeconds(n) {
+      if (n <= 1) return HOLD;
+      return HOLD * n + SLIDE * (n - 1);
+    }
+
+    function pairAt(n, t) {
+      var dur = bodySeconds(n);
+      var clip = n > 1 ? HOLD + SLIDE : HOLD;
+      if (n < 1) return { a: 0, b: -1, p: 0, la: 0, lb: 0, clip: clip };
+      if (t < 0) t = 0;
+      if (t > dur) t = dur;
+      if (n > 1) {
+        var k;
+        for (k = 1; k < n; k += 1) {
+          var start = k * HOLD;
+          if (t + 1e-6 >= start && t < start + SLIDE - 1e-6) {
+            return {
+              a: k - 1,
+              b: k,
+              p: (t - start) / SLIDE,
+              la: t - (k - 1) * HOLD,
+              lb: t - start,
+              clip: clip
+            };
+          }
+        }
+      }
+      var i = n === 1 ? 0 : Math.min(n - 1, Math.floor(t / HOLD));
+      return { a: i, b: -1, p: 0, la: t - i * HOLD, lb: 0, clip: clip };
+    }
+
+    function zoomAt(local, clip) {
+      var u = clip <= 0 ? 0 : Math.max(0, Math.min(1, local / clip));
+      return 1 + 0.045 * u;
+    }
+
+    function sweepX(t, duration) {
+      var u = duration <= 0 ? 0 : Math.max(0, Math.min(1, t / duration));
+      return -BAND + u * (W + BAND);
+    }
+
+    function bandAlpha(x) {
+      var mid = BAND / 2;
+      return Math.floor(88 * (1 - Math.abs(x - mid) / mid));
+    }
+
+    if (typeof document !== "undefined") {
+      var looks = document.querySelectorAll('input[name="look"]');
+      var photos = document.getElementById("photos");
+      var forName = document.getElementById("forName");
+      var make = document.getElementById("make");
+      var note = document.getElementById("status");
+      var handoff = document.getElementById("handoff");
+      var reel = document.getElementById("reel");
+      var send = document.getElementById("send");
+      var keep = document.getElementById("keep");
+      var stage = document.getElementById("stage");
+      var ctx = stage.getContext("2d");
+      var layer = document.createElement("canvas");
+      layer.width = W;
+      layer.height = H;
+      var lctx = layer.getContext("2d");
+      var made = null;
+      var madeUrl = "";
+      var busy = false;
+
+      function setStatus(text) { note.textContent = text; }
+
+      function pickedLook() {
+        var picked = "still";
+        var i;
+        for (i = 0; i < looks.length; i += 1) {
+          if (looks[i].checked) picked = looks[i].value;
+        }
+        return picked;
+      }
+
+      function markLook() {
+        var i;
+        for (i = 0; i < looks.length; i += 1) {
+          looks[i].parentNode.className = looks[i].checked ? "on" : "";
+        }
+      }
+
+      function mimeType() {
+        var types = [
+          "video/mp4;codecs=avc1.42E01E",
+          "video/mp4",
+          "video/webm;codecs=vp8",
+          "video/webm"
+        ];
+        if (typeof MediaRecorder === "undefined" || !stage.captureStream) return "";
+        var i;
+        for (i = 0; i < types.length; i += 1) {
+          if (MediaRecorder.isTypeSupported(types[i])) return types[i];
+        }
+        return "";
+      }
+
+      function paintPhoto(img, local, clip, warm) {
+        var z = zoomAt(local, clip);
+        var scale = Math.max(W / img.width, H / img.height) * z;
+        var dw = img.width * scale;
+        var dh = img.height * scale;
+        lctx.setTransform(1, 0, 0, 1, 0, 0);
+        lctx.clearRect(0, 0, W, H);
+        lctx.filter = warm ? "saturate(1.12) contrast(1.05)" : "none";
+        lctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
+        lctx.filter = "none";
+        if (warm) {
+          lctx.globalCompositeOperation = "soft-light";
+          lctx.fillStyle = "rgba(255, 170, 90, 0.42)";
+          lctx.fillRect(0, 0, W, H);
+          lctx.globalCompositeOperation = "source-over";
+        }
+      }
+
+      function blit(dx, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.drawImage(layer, dx, 0);
+        ctx.restore();
+      }
+
+      function drawSweep(t, duration) {
+        var x = sweepX(t, duration);
+        var g = ctx.createLinearGradient(x, 0, x + BAND, 0);
+        var mid = String(bandAlpha(BAND / 2) / 255);
+        g.addColorStop(0, "rgba(255,255,255,0)");
+        g.addColorStop(0.5, "rgba(255,255,255," + mid + ")");
+        g.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = g;
+        ctx.fillRect(x, 0, BAND, H);
+      }
+
+      function drawEnd(who) {
+        ctx.fillStyle = "#0D1928";
+        ctx.fillRect(0, 0, W, H);
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = '800 68px Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+        var brand = "MBOX";
+        var top = 520;
+        ctx.fillText(brand, W / 2, top);
+        var bw = ctx.measureText(brand).width;
+        ctx.fillStyle = "#B89047";
+        ctx.fillRect((W - bw) / 2, top + 92, bw, 6);
+        ctx.fillStyle = "#E8C26D";
+        ctx.font = '700 36px Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+        ctx.fillText(who, W / 2, top + 124);
+        ctx.fillStyle = "#D6D3D1";
+        ctx.font = '500 22px Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+        ctx.fillText("부스에서 만든 짧은 영상", W / 2, top + 188);
+      }
+
+      function drawAt(images, look, who, t) {
+        var body = bodySeconds(images.length);
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = "source-over";
+        ctx.fillStyle = "#0D1928";
+        ctx.fillRect(0, 0, W, H);
+        if (t >= body) {
+          drawEnd(who);
+          return;
+        }
+        var pair = pairAt(images.length, t);
+        var warm = look === "warm";
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, W, H);
+        ctx.clip();
+        if (pair.b >= 0 && look === "turn") {
+          paintPhoto(images[pair.a], pair.la, pair.clip, false);
+          blit(0, 1);
+          paintPhoto(images[pair.b], pair.lb, pair.clip, false);
+          blit((1 - pair.p) * W, 1);
+        } else if (pair.b >= 0) {
+          paintPhoto(images[pair.a], pair.la, pair.clip, warm);
+          blit(0, 1 - pair.p);
+          paintPhoto(images[pair.b], pair.lb, pair.clip, warm);
+          blit(0, pair.p);
+        } else {
+          paintPhoto(images[pair.a], pair.la, pair.clip, warm);
+          blit(0, 1);
+        }
+        ctx.restore();
+        if (look === "sweep") drawSweep(t, body);
+      }
+
+      function loadPhoto(file) {
+        return createImageBitmap(file).then(function (bmp) {
+          var edge = Math.max(bmp.width, bmp.height);
+          var scale = Math.min(1, 1280 / edge);
+          if (scale === 1) return bmp;
+          var c = document.createElement("canvas");
+          c.width = Math.max(2, Math.round(bmp.width * scale));
+          c.height = Math.max(2, Math.round(bmp.height * scale));
+          c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+          if (bmp.close) bmp.close();
+          return createImageBitmap(c);
+        });
+      }
+
+      function extOf(type) {
+        return type.indexOf("mp4") >= 0 ? "mp4" : "webm";
+      }
+
+      function finish(blob) {
+        if (madeUrl) URL.revokeObjectURL(madeUrl);
+        made = blob;
+        madeUrl = URL.createObjectURL(blob);
+        var ext = extOf(blob.type || "");
+        reel.src = madeUrl;
+        keep.href = madeUrl;
+        keep.setAttribute("download", "mbox-festival." + ext);
+        handoff.hidden = false;
+        var play = reel.play();
+        if (play && play.catch) play.catch(function () {});
+        setStatus("나왔습니다. 옆 사람에게 지금 보내세요.");
+        busy = false;
+        make.disabled = false;
+      }
+
+      function record(images, look, who) {
+        var mime = mimeType();
+        if (!mime) {
+          busy = false;
+          make.disabled = false;
+          setStatus("이 브라우저에서는 영상을 파일로 담지 못합니다.");
+          return;
+        }
+        var total = bodySeconds(images.length) + END;
+        var stream = stage.captureStream(30);
+        var rec;
+        try {
+          rec = new MediaRecorder(stream, { mimeType: mime });
+        } catch (err) {
+          busy = false;
+          make.disabled = false;
+          setStatus("이 브라우저에서는 영상을 파일로 담지 못합니다.");
+          return;
+        }
+        var chunks = [];
+        rec.ondataavailable = function (e) {
+          if (e.data && e.data.size) chunks.push(e.data);
+        };
+        rec.onstop = function () {
+          finish(new Blob(chunks, { type: rec.mimeType || mime }));
+        };
+        rec.onerror = function () {
+          busy = false;
+          make.disabled = false;
+          setStatus("영상을 담지 못했습니다.");
+        };
+        drawAt(images, look, who, 0);
+        var t0 = performance.now();
+        rec.start(100);
+        function frame(now) {
+          var t = (now - t0) / 1000;
+          drawAt(images, look, who, Math.min(t, total));
+          if (t < total + 0.12) {
+            requestAnimationFrame(frame);
+            return;
+          }
+          if (rec.state === "recording") rec.stop();
+        }
+        requestAnimationFrame(frame);
+      }
+
+      var n;
+      for (n = 0; n < looks.length; n += 1) {
+        looks[n].addEventListener("change", markLook);
+      }
+      photos.addEventListener("change", function () {
+        var count = (photos.files && photos.files.length) || 0;
+        document.getElementById("picked").textContent = count ? ("사진 " + Math.min(count, 6) + "장") : "";
+      });
+      make.addEventListener("click", function () {
+        if (busy) return;
+        var files = Array.prototype.slice.call(photos.files || []).slice(0, 6);
+        if (!files.length) {
+          setStatus("사진을 먼저 고르세요.");
+          return;
+        }
+        busy = true;
+        make.disabled = true;
+        handoff.hidden = true;
+        reel.removeAttribute("src");
+        setStatus("이 폰에서 만드는 중입니다.");
+        var look = pickedLook();
+        var who = cardLine(forName.value);
+        var ready = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+        ready.then(function () {
+          return Promise.all(files.map(loadPhoto));
+        }).then(function (images) {
+          record(images, look, who);
+        }).catch(function () {
+          busy = false;
+          make.disabled = false;
+          setStatus("사진을 읽지 못했습니다.");
+        });
+      });
+      send.addEventListener("click", function () {
+        if (!made) return;
+        var ext = extOf(made.type || "");
+        var file = new File([made], "mbox-festival." + ext, { type: made.type || "application/octet-stream" });
+        var text = cardLine(forName.value);
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: "MBOX", text: text }).catch(function (err) {
+            if (err && err.name === "AbortError") return;
+            keep.click();
+          });
+          return;
+        }
+        keep.click();
+      });
+      markLook();
+    }
+  </script>
+</body>
+</html>
