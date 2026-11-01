@@ -329,7 +329,7 @@
       <h1>같이 온 사람에게</h1>
       <p class="brand"><span><b>MBOX</b><i></i></span></p>
       <p class="lede">이 폰이 파일을 만듭니다. 부스 와이파이에는 들어오지 않아도 됩니다.</p>
-      <p class="aside">사진은 이 폰 안에만 있습니다. 소리는 없습니다. 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다. 큐브, 포개기, 구는 가로이고, 세운 카드는 세로입니다.</p>
+      <p class="aside">사진은 이 폰 안에만 있습니다. 소리는 없습니다. 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다. 세운 카드만 세로이고, 나머지는 가로입니다.</p>
     </div>
     <div id="player" class="player wide">
       <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-fantasy.mp4?v=20261101b"></video>
@@ -356,6 +356,21 @@
         <input type="radio" name="look" value="sphere">
         <span class="frame"><img alt="" src="template-previews/sphere-poster.jpg?v=20261101c"></span>
         <strong>구</strong><em>앞 사진이 크게 서고, 나머지가 구면으로 돕니다.</em>
+      </label>
+      <label class="wide">
+        <input type="radio" name="look" value="glass">
+        <span class="frame"><img alt="" src="template-previews/glass-poster.jpg?v=20261101j"></span>
+        <strong>유리</strong><em>얼굴이 유리 뒤로 비칩니다.</em>
+      </label>
+      <label class="wide">
+        <input type="radio" name="look" value="full">
+        <span class="frame"><img alt="" src="template-previews/full-poster.jpg?v=20261101j"></span>
+        <strong>가득</strong><em>사진이 화면을 채웁니다.</em>
+      </label>
+      <label class="wide">
+        <input type="radio" name="look" value="gallery">
+        <span class="frame"><img alt="" src="template-previews/gallery-poster.jpg?v=20261101j"></span>
+        <strong>방</strong><em>사진이 방 안에 섭니다.</em>
       </label>
     </fieldset>
     <p class="cap">예시 영상 · 손님 사진 아님</p>
@@ -1928,10 +1943,14 @@
         flip: "template-previews/flip-faces.mp4?v=20261027h",
         fan: "template-previews/fan-faces.mp4?v=20261027h",
         cube: "template-previews/cube-fantasy.mp4?v=20261101b",
-        sphere: "template-previews/sphere.mp4?v=20261101c"
+        sphere: "template-previews/sphere.mp4?v=20261101c",
+        glass: "template-previews/glass.mp4?v=20261101j",
+        full: "template-previews/full.mp4?v=20261101j",
+        gallery: "template-previews/gallery.mp4?v=20261101j"
       };
       var CLIP_RATE = { cards: 1.1 };
-      var renderedLook = { cube: true, cards: true, pile: true, sphere: true };
+      var renderedLook = { cube: true, cards: true, pile: true, sphere: true, glass: true, full: true, gallery: true };
+      var exampleOnly = { sphere: true, glass: true, full: true, gallery: true };
 
       function setStatus(text) { note.textContent = text; }
       function checkedValue(name, fallback) {
@@ -1979,10 +1998,10 @@
       function markLook() {
         var look = pickedLook();
         var i;
-        var wide = look === "cube" || look === "pile" || look === "sphere";
+        var wide = look !== "cards";
         player.classList.toggle("wide", wide);
         for (i = 0; i < looks.length; i += 1) {
-          var chipWide = looks[i].value === "cube" || looks[i].value === "pile" || looks[i].value === "sphere";
+          var chipWide = looks[i].value !== "cards";
           looks[i].parentNode.className = (looks[i].checked ? "on " : "") + (chipWide ? "wide" : "");
         }
         if (playerVideo.getAttribute("src") !== CLIPS[look]) {
@@ -2424,8 +2443,8 @@
           setStatus("사진을 먼저 고르세요.");
           return;
         }
-        if (pickedLook() === "sphere") {
-          setStatus("구는 예시 영상입니다. 이 폰은 그 구면을 다시 그리지 못합니다.");
+        if (exampleOnly[pickedLook()]) {
+          setStatus("이 모습은 예시 영상입니다. 이 폰은 같은 화면을 다시 그리지 못합니다.");
           return;
         }
         busy = true;
