@@ -94,20 +94,21 @@
       position: relative;
       width: 100%;
       margin-top: 14px;
-      aspect-ratio: 9 / 19.5;
-      background: #000;
+      aspect-ratio: 16 / 9;
+      background: transparent;
       overflow: hidden;
     }
-    .player.wide { aspect-ratio: 16 / 9; }
+    .player.wide { background: #000; }
     .player video, .player canvas {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      background: #000;
+      object-fit: contain;
+      background: transparent;
       display: block;
     }
+    .player.wide video { object-fit: cover; background: #000; }
     .shelf {
       display: flex;
       gap: 8px;
@@ -125,27 +126,29 @@
       height: 1px;
       overflow: hidden;
     }
+    .shelf { align-items: flex-start; }
     .shelf label {
       position: relative;
-      flex: 0 0 46vw;
-      width: 46vw;
-      max-width: 210px;
-      min-width: 164px;
+      flex: 0 0 auto;
+      width: 132px;
       scroll-snap-align: start;
       color: #18181B;
       cursor: pointer;
     }
+    .shelf label.wide { width: 196px; }
     .shelf input { position: absolute; opacity: 0; }
     .shelf .frame {
       position: relative;
       display: block;
-      aspect-ratio: 9 / 19.5;
+      width: 78px;
+      height: 110px;
+      margin: 0 auto;
       overflow: hidden;
-      border-radius: 16px;
+      border-radius: 14px;
       background: #000;
     }
     .shelf label.on .frame { box-shadow: inset 0 0 0 3px #B89047; }
-    .shelf label.wide .frame { aspect-ratio: 16 / 9; }
+    .shelf label.wide .frame { width: 100%; background: #000; }
     .shelf video, .shelf img {
       position: absolute;
       inset: 0;
