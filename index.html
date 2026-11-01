@@ -98,6 +98,7 @@
       background: #000;
       overflow: hidden;
     }
+    .player.wide { aspect-ratio: 16 / 9; }
     .player video, .player canvas {
       position: absolute;
       inset: 0;
@@ -144,6 +145,7 @@
       background: #000;
     }
     .shelf label.on .frame { box-shadow: inset 0 0 0 3px #B89047; }
+    .shelf label.wide .frame { aspect-ratio: 16 / 9; }
     .shelf video, .shelf img {
       position: absolute;
       inset: 0;
@@ -323,17 +325,17 @@
       <h1>같이 온 사람에게</h1>
       <p class="brand"><span><b>MBOX</b><i></i></span></p>
       <p class="lede">이 폰이 파일을 만듭니다. 부스 와이파이에는 들어오지 않아도 됩니다.</p>
-      <p class="aside">사진은 이 폰 안에만 있습니다. 소리 없는 세로 영상이고, 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다.</p>
+      <p class="aside">사진은 이 폰 안에만 있습니다. 소리는 없습니다. 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다. 큐브와 포개기는 가로이고, 세운 카드는 세로입니다.</p>
     </div>
-    <div id="player" class="player">
-      <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-fantasy.mp4?v=20261029g"></video>
+    <div id="player" class="player wide">
+      <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-fantasy.mp4?v=20261101b"></video>
       <canvas id="stage" width="720" height="1560"></canvas>
     </div>
     <fieldset class="shelf">
       <legend>모습</legend>
-      <label class="on">
+      <label class="on wide">
         <input type="radio" name="look" value="cube" checked>
-        <span class="frame"><img alt="" src="template-previews/cube-fantasy-poster.jpg?v=20261029g"></span>
+        <span class="frame"><img alt="" src="template-previews/cube-fantasy-poster.jpg?v=20261101b"></span>
         <strong>큐브</strong><em>유리 안에 얼굴이 겹쳐 비칩니다.</em>
       </label>
       <label>
@@ -341,9 +343,9 @@
         <span class="frame"><img alt="" src="template-previews/cards-aep-poster.jpg?v=20261029i"></span>
         <strong>세운 카드</strong><em>둥근 카드가 천천히 넘어갑니다.</em>
       </label>
-      <label>
+      <label class="wide">
         <input type="radio" name="look" value="pile">
-        <span class="frame"><img alt="" src="template-previews/pile-mixkit-poster.jpg?v=20261029f"></span>
+        <span class="frame"><img alt="" src="template-previews/pile-mixkit-poster.jpg?v=20261101b"></span>
         <strong>포개기</strong><em>인화가 기울어진 채 겹칩니다.</em>
       </label>
     </fieldset>
@@ -1913,10 +1915,10 @@
       var facesReady = false;
       var CLIPS = {
         cards: "template-previews/cards-aep.mp4?v=20261029i",
-        pile: "template-previews/pile-mixkit.mp4?v=20261029f",
+        pile: "template-previews/pile-mixkit.mp4?v=20261101b",
         flip: "template-previews/flip-faces.mp4?v=20261027h",
         fan: "template-previews/fan-faces.mp4?v=20261027h",
-        cube: "template-previews/cube-fantasy.mp4?v=20261029g"
+        cube: "template-previews/cube-fantasy.mp4?v=20261101b"
       };
       var CLIP_RATE = { cards: 1.1 };
       var renderedLook = { cube: true, cards: true, pile: true };
@@ -1967,8 +1969,11 @@
       function markLook() {
         var look = pickedLook();
         var i;
+        var wide = look === "cube" || look === "pile";
+        player.classList.toggle("wide", wide);
         for (i = 0; i < looks.length; i += 1) {
-          looks[i].parentNode.className = looks[i].checked ? "on" : "";
+          var chipWide = looks[i].value === "cube" || looks[i].value === "pile";
+          looks[i].parentNode.className = (looks[i].checked ? "on " : "") + (chipWide ? "wide" : "");
         }
         if (playerVideo.getAttribute("src") !== CLIPS[look]) {
           playerVideo.src = CLIPS[look];
