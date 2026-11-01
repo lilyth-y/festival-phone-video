@@ -325,7 +325,7 @@
       <h1>같이 온 사람에게</h1>
       <p class="brand"><span><b>MBOX</b><i></i></span></p>
       <p class="lede">이 폰이 파일을 만듭니다. 부스 와이파이에는 들어오지 않아도 됩니다.</p>
-      <p class="aside">사진은 이 폰 안에만 있습니다. 소리는 없습니다. 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다. 큐브와 포개기는 가로이고, 세운 카드는 세로입니다.</p>
+      <p class="aside">사진은 이 폰 안에만 있습니다. 소리는 없습니다. 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다. 큐브, 포개기, 구는 가로이고, 세운 카드는 세로입니다.</p>
     </div>
     <div id="player" class="player wide">
       <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-fantasy.mp4?v=20261101b"></video>
@@ -347,6 +347,11 @@
         <input type="radio" name="look" value="pile">
         <span class="frame"><img alt="" src="template-previews/pile-mixkit-poster.jpg?v=20261101b"></span>
         <strong>포개기</strong><em>인화가 기울어진 채 겹칩니다.</em>
+      </label>
+      <label class="wide">
+        <input type="radio" name="look" value="sphere">
+        <span class="frame"><img alt="" src="template-previews/sphere-poster.jpg?v=20261101c"></span>
+        <strong>구</strong><em>앞 사진이 크게 서고, 나머지가 구면으로 돕니다.</em>
       </label>
     </fieldset>
     <p class="cap">예시 영상 · 손님 사진 아님</p>
@@ -1918,10 +1923,11 @@
         pile: "template-previews/pile-mixkit.mp4?v=20261101b",
         flip: "template-previews/flip-faces.mp4?v=20261027h",
         fan: "template-previews/fan-faces.mp4?v=20261027h",
-        cube: "template-previews/cube-fantasy.mp4?v=20261101b"
+        cube: "template-previews/cube-fantasy.mp4?v=20261101b",
+        sphere: "template-previews/sphere.mp4?v=20261101c"
       };
       var CLIP_RATE = { cards: 1.1 };
-      var renderedLook = { cube: true, cards: true, pile: true };
+      var renderedLook = { cube: true, cards: true, pile: true, sphere: true };
 
       function setStatus(text) { note.textContent = text; }
       function checkedValue(name, fallback) {
@@ -1969,10 +1975,10 @@
       function markLook() {
         var look = pickedLook();
         var i;
-        var wide = look === "cube" || look === "pile";
+        var wide = look === "cube" || look === "pile" || look === "sphere";
         player.classList.toggle("wide", wide);
         for (i = 0; i < looks.length; i += 1) {
-          var chipWide = looks[i].value === "cube" || looks[i].value === "pile";
+          var chipWide = looks[i].value === "cube" || looks[i].value === "pile" || looks[i].value === "sphere";
           looks[i].parentNode.className = (looks[i].checked ? "on " : "") + (chipWide ? "wide" : "");
         }
         if (playerVideo.getAttribute("src") !== CLIPS[look]) {
@@ -2412,6 +2418,10 @@
         var files = Array.prototype.slice.call(photos.files || []).slice(0, 6);
         if (!files.length && !(userImages && userImages.length)) {
           setStatus("사진을 먼저 고르세요.");
+          return;
+        }
+        if (pickedLook() === "sphere") {
+          setStatus("구는 예시 영상입니다. 이 폰은 그 구면을 다시 그리지 못합니다.");
           return;
         }
         busy = true;
