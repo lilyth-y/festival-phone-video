@@ -329,7 +329,7 @@
       <h1>같이 온 사람에게</h1>
       <p class="brand"><span><b>MBOX</b><i></i></span></p>
       <p class="lede">이 폰이 파일을 만듭니다. 부스 와이파이에는 들어오지 않아도 됩니다.</p>
-      <p class="aside">사진은 이 폰 안에만 있습니다. 소리는 없습니다. 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다. 세운 카드만 세로이고, 나머지는 가로입니다.</p>
+      <p class="aside">사진은 이 폰 안에만 있습니다. 소리는 없습니다. 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다. 세운 카드와 기울임만 세로이고, 나머지는 가로입니다.</p>
     </div>
     <div id="player" class="player wide">
       <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-fantasy.mp4?v=20261101b"></video>
@@ -371,6 +371,21 @@
         <input type="radio" name="look" value="gallery">
         <span class="frame"><img alt="" src="template-previews/gallery-poster.jpg?v=20261101j"></span>
         <strong>방</strong><em>사진이 방 안에 섭니다.</em>
+      </label>
+      <label class="wide">
+        <input type="radio" name="look" value="page">
+        <span class="frame"><img alt="" src="template-previews/page-poster.jpg?v=20261101k"></span>
+        <strong>페이지</strong><em>모서리가 말리며 넘어갑니다.</em>
+      </label>
+      <label class="wide">
+        <input type="radio" name="look" value="wall">
+        <span class="frame"><img alt="" src="template-previews/wall-poster.jpg?v=20261101k"></span>
+        <strong>벽</strong><em>큰 인화가 집게로 벽에 붙습니다.</em>
+      </label>
+      <label>
+        <input type="radio" name="look" value="tilt">
+        <span class="frame"><img alt="" src="template-previews/tilt-poster.jpg?v=20261101k"></span>
+        <strong>기울임</strong><em>기울인 인화가 세로로 겹칩니다.</em>
       </label>
     </fieldset>
     <p class="cap">예시 영상 · 손님 사진 아님</p>
@@ -1946,11 +1961,15 @@
         sphere: "template-previews/sphere.mp4?v=20261101c",
         glass: "template-previews/glass.mp4?v=20261101j",
         full: "template-previews/full.mp4?v=20261101j",
-        gallery: "template-previews/gallery.mp4?v=20261101j"
+        gallery: "template-previews/gallery.mp4?v=20261101j",
+        page: "template-previews/page.mp4?v=20261101k",
+        wall: "template-previews/wall.mp4?v=20261101k",
+        tilt: "template-previews/tilt.mp4?v=20261101k"
       };
       var CLIP_RATE = { cards: 1.1 };
-      var renderedLook = { cube: true, cards: true, pile: true, sphere: true, glass: true, full: true, gallery: true };
-      var exampleOnly = { sphere: true, glass: true, full: true, gallery: true };
+      var portraitLook = { cards: true, tilt: true };
+      var renderedLook = { cube: true, cards: true, pile: true, sphere: true, glass: true, full: true, gallery: true, page: true, wall: true, tilt: true };
+      var exampleOnly = { sphere: true, glass: true, full: true, gallery: true, page: true, wall: true, tilt: true };
 
       function setStatus(text) { note.textContent = text; }
       function checkedValue(name, fallback) {
@@ -1998,10 +2017,10 @@
       function markLook() {
         var look = pickedLook();
         var i;
-        var wide = look !== "cards";
+        var wide = !portraitLook[look];
         player.classList.toggle("wide", wide);
         for (i = 0; i < looks.length; i += 1) {
-          var chipWide = looks[i].value !== "cards";
+          var chipWide = !portraitLook[looks[i].value];
           looks[i].parentNode.className = (looks[i].checked ? "on " : "") + (chipWide ? "wide" : "");
         }
         if (playerVideo.getAttribute("src") !== CLIPS[look]) {
