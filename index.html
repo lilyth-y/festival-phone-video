@@ -326,35 +326,25 @@
       <p class="aside">사진은 이 폰 안에만 있습니다. 소리 없는 세로 영상이고, 부스로 보내지 않습니다. 로그인과 결제는 없습니다. 주문 앨범이 아닙니다.</p>
     </div>
     <div id="player" class="player">
-      <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-faces.mp4?v=20261027h"></video>
+      <video id="playerVideo" muted loop playsinline autoplay preload="auto" src="template-previews/cube-fantasy.mp4?v=20261029g"></video>
       <canvas id="stage" width="720" height="1560"></canvas>
     </div>
     <fieldset class="shelf">
       <legend>모습</legend>
       <label class="on">
         <input type="radio" name="look" value="cube" checked>
-        <span class="frame"><img alt="" src="template-previews/cube-poster.jpg?v=20261027h"></span>
-        <strong>큐브</strong><em>가까운 큐브가 한 번 돌아 다음 얼굴을 보여 줍니다.</em>
+        <span class="frame"><img alt="" src="template-previews/cube-fantasy-poster.jpg?v=20261029g"></span>
+        <strong>큐브</strong><em>유리 안에 얼굴이 겹쳐 비칩니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="cards">
-        <span class="frame"><img alt="" src="template-previews/stand-poster.jpg?v=20261027h"></span>
-        <strong>세운 카드</strong><em>두 얼굴이 나란히 선 뒤 새 카드가 앞을 차지합니다.</em>
+        <span class="frame"><img alt="" src="template-previews/cards-aep-poster.jpg?v=20261029i"></span>
+        <strong>세운 카드</strong><em>둥근 카드가 천천히 넘어갑니다.</em>
       </label>
       <label>
         <input type="radio" name="look" value="pile">
-        <span class="frame"><img alt="" src="template-previews/pile-poster.jpg?v=20261027h"></span>
-        <strong>포개기</strong><em>다음 인화가 위에서 떨어져 겹칩니다.</em>
-      </label>
-      <label>
-        <input type="radio" name="look" value="flip">
-        <span class="frame"><img alt="" src="template-previews/flip-poster.jpg?v=20261027h"></span>
-        <strong>뒤집기</strong><em>큰 카드가 돌려져 다음 얼굴을 보여 줍니다.</em>
-      </label>
-      <label>
-        <input type="radio" name="look" value="fan">
-        <span class="frame"><img alt="" src="template-previews/fan-poster.jpg?v=20261027h"></span>
-        <strong>붙여 오르기</strong><em>카드가 올라오며 여러 얼굴이 펼쳐집니다.</em>
+        <span class="frame"><img alt="" src="template-previews/pile-mixkit-poster.jpg?v=20261029f"></span>
+        <strong>포개기</strong><em>인화가 기울어진 채 겹칩니다.</em>
       </label>
     </fieldset>
     <p class="cap">예시 영상 · 손님 사진 아님</p>
@@ -368,18 +358,18 @@
         </div>
       </fieldset>
       <fieldset class="choice">
-        <legend>입자</legend>
+        <legend>반짝임</legend>
         <div>
           <label><input type="radio" name="fx" value="off">끄기</label>
-          <label class="on"><input type="radio" name="fx" value="dust" checked>먼지</label>
-          <label><input type="radio" name="fx" value="lights">불빛</label>
+          <label class="on"><input type="radio" name="fx" value="dust" checked>별가루</label>
+          <label><input type="radio" name="fx" value="lights">별빛</label>
         </div>
       </fieldset>
       <label class="who"><span>이름</span>
         <input id="forName" maxlength="16" placeholder="이름. 비워 두면 같이 온 사람" autocomplete="off">
       </label>
       <label class="pick" for="photos">사진 고르기</label>
-      <input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+      <input id="photos" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" multiple>
       <p id="picked"></p>
       <button id="make" class="primary" type="button">영상 만들기</button>
       <p id="status" role="status"></p>
@@ -456,10 +446,10 @@
       return leadOf(look) + (count - 1) * slotOf(look) + 0.08;
     }
 
-    function standIdle(i) { return { i: i, x: 148, y: 268, w: 424, h: 900, rot: 0, rotZ: 0 }; }
-    function standBack(i) { return { i: i, x: 48, y: 340, w: 250, h: 560, rot: 0.15, rotZ: 0 }; }
-    function standFar(i) { return { i: i, x: 430, y: 460, w: 210, h: 460, rot: 0.72, rotZ: 0 }; }
-    function standClose(i) { return { i: i, x: 250, y: 300, w: 360, h: 780, rot: 0.34, rotZ: 0 }; }
+    function standIdle(i) { return { i: i, x: 36, y: 56, w: 648, h: 1448, rot: 0, rotZ: 0 }; }
+    function standBack(i) { return { i: i, x: 16, y: 140, w: 420, h: 1180, rot: 1.05, rotZ: 0 }; }
+    function standFar(i) { return { i: i, x: 220, y: 160, w: 460, h: 1200, rot: 1.15, rotZ: 0 }; }
+    function standClose(i) { return { i: i, x: 56, y: 80, w: 620, h: 1380, rot: 0.28, rotZ: 0 }; }
     function cardInside(card) {
       return card.x >= -2 && card.y >= -2 && card.x + card.w <= W + 2 && card.y + card.h <= H + 2;
     }
@@ -475,8 +465,15 @@
       var newI = step + 1;
       var cards = [];
       if (u < STAND.travel) {
-        var back = mixCard(standIdle(oldI), standBack(oldI), easeOutCubic(u / STAND.travel));
+        var leave = easeOutCubic(u / STAND.travel);
+        var back = mixCard(standIdle(oldI), standBack(oldI), leave);
         if (cardInside(back)) cards.push(back);
+        var enter = mixCard(
+          { i: newI, x: 430, y: 200, w: 270, h: 1080, rot: 1.28, rotZ: 0 },
+          standFar(newI),
+          leave
+        );
+        if (cardInside(enter)) cards.push(enter);
         if (!cards.length) cards.push(standIdle(oldI));
         return cards;
       }
@@ -503,11 +500,11 @@
       var side = i % 2 === 0 ? -1 : 1;
       return {
         i: i,
-        cx: 360 + side * 18,
-        cy: 730 - i * 10,
-        w: 430,
-        h: 900,
-        rot: side * -0.04
+        cx: 360 + side * 16,
+        cy: 800 - i * 14,
+        w: 640,
+        h: 1120,
+        rot: side * -0.11
       };
     }
     function pileLayout(n, t) {
@@ -533,14 +530,16 @@
           if (local < 0) break;
           if (local < PILE.fall) {
             var p = easeInQuad(local / PILE.fall);
-            item.cy = mixNum(-820, rest.cy + PILE.overshoot, p);
-            item.cx = mixNum(rest.cx + 36, rest.cx, p);
-            item.rot = mixNum(-0.2, rest.rot, p);
-            item.pitch = mixNum(0.62, 0.08, p);
+            item.cy = mixNum(170, rest.cy + PILE.overshoot, p);
+            item.cx = mixNum(rest.cx + 20, rest.cx, p);
+            item.w = mixNum(220, rest.w, p);
+            item.h = mixNum(380, rest.h, p);
+            item.rot = mixNum(rest.rot - 0.18, rest.rot, p);
+            item.pitch = 0;
           } else if (local < PILE.fall + PILE.settle) {
             var s = easeOutCubic((local - PILE.fall) / PILE.settle);
             item.cy = mixNum(rest.cy + PILE.overshoot, rest.cy, s);
-            item.pitch = mixNum(0.08, 0, s);
+            item.pitch = 0;
           } else {
             item.pitch = 0;
           }
@@ -1052,7 +1051,7 @@
       ctx.shadowBlur = 32;
       ctx.shadowOffsetY = 18;
       ctx.save();
-      traceRound(ctx, -faceW / 2, -h / 2, faceW, h, 28);
+      traceRound(ctx, -faceW / 2, -h / 2, faceW, h, w > 560 ? Math.round(Math.min(w, h) * 0.09) : 28);
       ctx.clip();
       drawCover(ctx, img, -faceW / 2, -h / 2, faceW, h);
       ctx.restore();
@@ -1163,12 +1162,12 @@
       var m = PILE.margin;
       var pitch = item.pitch || 0;
       ctx.save();
-      ctx.translate(item.cx + 10, item.cy + 26);
+      ctx.translate(item.cx + 18, item.cy + 28);
       ctx.rotate(item.rot);
-      ctx.fillStyle = "rgba(0,0,0,0.38)";
-      ctx.shadowColor = "rgba(0,0,0,0.45)";
-      ctx.shadowBlur = 28;
-      ctx.shadowOffsetY = 8;
+      ctx.fillStyle = "rgba(70,58,46,0.22)";
+      ctx.shadowColor = "rgba(70,58,46,0.28)";
+      ctx.shadowBlur = 36;
+      ctx.shadowOffsetY = 10;
       traceSheet(ctx, w, h, pitch);
       ctx.fill();
       clearShadow(ctx);
@@ -1195,8 +1194,7 @@
       for (i = 0; i < cards.length; i += 1) {
         var card = cards[i];
         if (!cardInside(card)) continue;
-        paintFloorShadow(ctx, card.x, card.y, card.w, card.h);
-        paintTurn(ctx, asPrint(images[card.i]), null, card.rot, card.x + card.w / 2, card.y + card.h / 2, card.w, card.h);
+        paintFlat(ctx, images[card.i], card.x + card.w / 2, card.y + card.h / 2, card.w, card.h, card.rot);
       }
     }
 
@@ -1205,8 +1203,7 @@
       var i;
       for (i = 0; i < items.length; i += 1) {
         var item = items[i];
-        paintFloorShadow(ctx, item.cx - item.w / 2, item.cy - item.h / 2, item.w, item.h);
-        paintPrint(ctx, asPrint(images[item.i]), item);
+        paintPrint(ctx, images[item.i], item);
       }
     }
 
@@ -1288,8 +1285,22 @@
       return cubePromise;
     }
 
-    function faceCanvas(img) {
-      return img;
+    function framedFace(img) {
+      if (img && img.__frame) return img.__frame;
+      var c = document.createElement("canvas");
+      c.width = 640;
+      c.height = 640;
+      var g = c.getContext("2d");
+      g.fillStyle = "#f4f1ea";
+      g.fillRect(0, 0, 640, 640);
+      var margin = 36;
+      var inner = 640 - margin * 2;
+      var sw = img.width;
+      var sh = Math.min(img.height, sw);
+      var sy = Math.max(0, Math.min(img.height - sh, Math.round(img.height * 0.12)));
+      g.drawImage(img, 0, sy, sw, sh, margin, margin, inner, inner);
+      if (img) img.__frame = c;
+      return c;
     }
 
     function putTexture(scene, source, spin) {
@@ -1368,7 +1379,7 @@
       camera.upperBetaLimit = 1.5;
       scene.activeCamera = camera;
       var face = cubeFaceSize();
-      var box = B.MeshBuilder.CreateBox("큐브", { width: face.faceW, height: face.faceH, depth: face.faceW }, scene);
+      var box = B.MeshBuilder.CreateBox("큐브", { width: 1.5, height: 1.5, depth: 1.5 }, scene);
       var multi = new B.MultiMaterial("faces", scene);
       var mats = [];
       var f = 0;
@@ -1564,30 +1575,23 @@
       if (cubeState.texKey !== key) {
         for (f = 0; f < 6; f += 1) {
           cubeState.mats[f].albedoTexture = null;
-          cubeState.mats[f].albedoColor = new BABYLON.Color3(0, 0, 0);
+          cubeState.mats[f].albedoColor = new BABYLON.Color3(0.965, 0.953, 0.933);
         }
-        cubeState.photoTex[FACE_FRONT] = putTexture(cubeState.scene, faceCanvas(images[st.front]), true);
-        cubeState.photoTex[FACE_SIDE] = images[st.side] && st.side !== st.front
-          ? putTexture(cubeState.scene, faceCanvas(images[st.side]), "cw")
-          : null;
+        cubeState.photoTex[FACE_FRONT] = putTexture(cubeState.scene, framedFace(images[st.front]), true);
+        cubeState.photoTex[FACE_SIDE] = images[st.side] != null
+          ? putTexture(cubeState.scene, framedFace(images[st.side]), "cw")
+          : cubeState.photoTex[FACE_FRONT];
         cubeState.box.material = cubeState.multi;
         cubeState.texKey = key;
       }
-      var bgRgb = hexColor(currentBg());
-      var stageColor = new BABYLON.Color3(bgRgb.r, bgRgb.g, bgRgb.b);
-      function showFace(index, visible) {
+      function showFace(index, dim) {
         var mat = cubeState.mats[index];
-        if (visible && cubeState.photoTex[index]) {
-          var dim = index === FACE_SIDE && Math.sin(st.angle * 2) > 0.4 ? 0.74 : 1;
-          mat.albedoColor = new BABYLON.Color3(dim, dim, dim);
-          mat.albedoTexture = cubeState.photoTex[index];
-        } else {
-          mat.albedoTexture = null;
-          mat.albedoColor = stageColor;
-        }
+        if (!cubeState.photoTex[index]) return;
+        mat.albedoTexture = cubeState.photoTex[index];
+        mat.albedoColor = new BABYLON.Color3(dim, dim, dim);
       }
-      showFace(FACE_FRONT, Math.cos(st.angle) > 0.62);
-      showFace(FACE_SIDE, Math.sin(st.angle) > 0.5);
+      showFace(FACE_FRONT, 1);
+      showFace(FACE_SIDE, 0.9);
     }
 
     function gradientTex(c0, c1) {
@@ -1737,6 +1741,34 @@
       if (cubeState.rim) cubeState.rim.isVisible = false;
     }
 
+    function showFallingCube(images, t) {
+      setRoomVisible(false);
+      var i;
+      for (i = 0; i < cubeState.motes.length; i += 1) cubeState.motes[i].isVisible = false;
+      cubeState.scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+      var st = cubeView(images.length, t);
+      assignCubeFaces(st, images);
+      var slot = cubeSlot();
+      var local = t - CUBE.lead;
+      var u = 0;
+      if (images.length > 1 && local > 0) {
+        u = local - Math.min(images.length - 2, Math.floor(local / slot)) * slot;
+      }
+      var falling = u < 0.46 ? 1 - easeOutCubic(u / 0.46) : 0;
+      var turning = st.angle > 0.12 && st.angle < Math.PI / 2 - 0.12;
+      cubeState.box.isVisible = true;
+      cubeState.box.rotation.x = falling * 0.18;
+      cubeState.box.rotation.z = falling * -0.06;
+      cubeState.box.rotation.y = st.angle * CUBE_Y_SIGN + falling * 0.22;
+      cubeState.box.position.set(0, falling * 0.85, 0);
+      var cam = cubeState.scene.activeCamera;
+      cam.fov = 0.68;
+      cam.alpha = -Math.PI / 2;
+      cam.beta = Math.PI / 2 - (falling > 0.15 ? 0.16 : turning ? 0.12 : 0.03);
+      cam.radius = falling > 0.15 ? 7.6 : turning ? 6.7 : 5.35;
+      cam.setTarget(new BABYLON.Vector3(0, cubeState.box.position.y * 0.2, 0));
+    }
+
     function shotPose(angle) {
       var p = angle / (Math.PI / 2);
       if (p < 0) p = 0;
@@ -1785,36 +1817,12 @@
     function renderCube(images, t, bg, kind, who, body) {
       if (!ensureCube()) return false;
       if (cubeState.gl.width !== W || cubeState.gl.height !== H) cubeState.engine.setSize(W, H);
-      applyRoom(bg);
       var ending = !!(who && t >= body);
       if (ending) {
         showCubeEnd(who);
       } else {
         cubeState.endPlane.isVisible = false;
-        setRoomVisible(true);
-        if (images.length < 2) cubeState.cardB.mesh.isVisible = false;
-        if (cubeState.texA !== images[0] || cubeState.texB !== (images[1] || null)) {
-          setPrint(cubeState.cardA, images[0]);
-          setPrint(cubeState.cardB, images.length > 1 ? images[1] : null);
-          cubeState.texA = images[0];
-          cubeState.texB = images[1] || null;
-        }
-        var st = cubeView(images.length, t);
-        var pose = shotPose(st.angle);
-        var cam = cubeState.scene.activeCamera;
-        cam.fov = CUBE.fov;
-        cam.alpha = pose.alpha;
-        cam.beta = pose.beta;
-        cam.radius = pose.radius;
-        cam.setTarget(new BABYLON.Vector3(pose.tx, pose.ty, pose.tz));
-        cubeState.cardA.mesh.rotation.y = pose.yaw;
-        var ap = cubeState.cardA.mesh.position;
-        cubeState.shadeA.position.set(ap.x + Math.sin(pose.yaw) * 0.06, -0.82, ap.z - 0.16);
-        cubeState.shadeA.rotation.y = pose.yaw;
-        var bp = cubeState.cardB.mesh.position;
-        cubeState.shadeB.position.set(bp.x, -0.82, bp.z - 0.12);
-        cubeState.shadeB.isVisible = images.length > 1;
-        placeMotes(kind, t, bg);
+        showFallingCube(images, t);
       }
       cubeState.scene.render();
       cubeState.scene.render();
@@ -1841,13 +1849,26 @@
       }
       var time = t;
       if (!who && t > body) time = body;
+      if (look === "cards") {
+        ctx.fillStyle = "#0D1928";
+        ctx.fillRect(0, 0, W, H);
+        drawStand(ctx, images, time);
+        return;
+      }
+      if (look === "pile") {
+        var ivory = ctx.createLinearGradient(0, 0, W, H);
+        ivory.addColorStop(0, "#F7F4EF");
+        ivory.addColorStop(1, "#E4DDD2");
+        ctx.fillStyle = ivory;
+        ctx.fillRect(0, 0, W, H);
+        drawPile(ctx, images, time);
+        return;
+      }
       paintRoom(ctx, bg);
       drawParticles(ctx, kind, time, bg, "far");
       paintMat(ctx, roomTones(bg), rearImage(look, images, time));
-      if (look === "pile") drawPile(ctx, images, time);
-      else if (look === "flip") drawFlip(ctx, images, time);
-      else if (look === "fan") drawFan(ctx, images, time);
-      else drawStand(ctx, images, time);
+      if (look === "flip") drawFlip(ctx, images, time);
+      else drawFan(ctx, images, time);
       drawParticles(ctx, kind, time, bg, "near");
     }
 
@@ -1891,12 +1912,14 @@
       var userImages = null;
       var facesReady = false;
       var CLIPS = {
-        cards: "template-previews/stand-faces.mp4?v=20261027h",
-        pile: "template-previews/pile-faces.mp4?v=20261027h",
+        cards: "template-previews/cards-aep.mp4?v=20261029i",
+        pile: "template-previews/pile-mixkit.mp4?v=20261029f",
         flip: "template-previews/flip-faces.mp4?v=20261027h",
         fan: "template-previews/fan-faces.mp4?v=20261027h",
-        cube: "template-previews/cube-faces.mp4?v=20261027h"
+        cube: "template-previews/cube-fantasy.mp4?v=20261029g"
       };
+      var CLIP_RATE = { cards: 1.1 };
+      var renderedLook = { cube: true, cards: true, pile: true };
 
       function setStatus(text) { note.textContent = text; }
       function checkedValue(name, fallback) {
@@ -1930,9 +1953,15 @@
         playerVideo.style.visibility = el ? "hidden" : "visible";
         if (el) playerVideo.pause();
         else {
+          applyClipRate();
           var again = playerVideo.play();
           if (again && again.catch) again.catch(function () {});
         }
+      }
+
+      function applyClipRate() {
+        var rate = CLIP_RATE[pickedLook()] || 1;
+        if (playerVideo.playbackRate !== rate) playerVideo.playbackRate = rate;
       }
 
       function markLook() {
@@ -1943,10 +1972,11 @@
         }
         if (playerVideo.getAttribute("src") !== CLIPS[look]) {
           playerVideo.src = CLIPS[look];
+          applyClipRate();
           var play = playerVideo.play();
           if (play && play.catch) play.catch(function () {});
         }
-        if (look === "cube") loadBabylon().catch(function () { cubeFailed = true; });
+        applyClipRate();
         markChips("bg");
         markChips("fx");
       }
@@ -1971,6 +2001,10 @@
 
       function paintPreview(t) {
         var look = pickedLook();
+        if (renderedLook[look]) {
+          mountSurface(null);
+          return;
+        }
         var images = previewImages(look);
         if (!images.length) return;
         if (look === "cube" && !window.BABYLON) {
@@ -1995,21 +2029,6 @@
         tick += 1;
         var gen = tick;
         requestAnimationFrame(function () { loopPreview(gen, performance.now()); });
-      }
-
-      function mimeType(canvas) {
-        var types = [
-          "video/mp4;codecs=avc1.42E01E",
-          "video/mp4",
-          "video/webm;codecs=vp8",
-          "video/webm"
-        ];
-        if (typeof MediaRecorder === "undefined" || !canvas.captureStream) return "";
-        var i;
-        for (i = 0; i < types.length; i += 1) {
-          if (MediaRecorder.isTypeSupported(types[i])) return types[i];
-        }
-        return "";
       }
 
       function loadPhoto(file) {
@@ -2067,53 +2086,135 @@
         startPreview();
       }
 
-      function captureClip(images, look, who, done, fail) {
-        var surface = look === "cube" ? cubeState.gl : stage;
-        var mime = mimeType(surface);
-        if (!mime) {
-          fail("mime");
-          return;
+      function padFrame(source) {
+        var w = source.width || W;
+        var h = source.height || H;
+        var ew = Math.ceil(w / 16) * 16;
+        var eh = Math.ceil(h / 16) * 16;
+        if (ew === w && eh === h) return source;
+        if (!padFrame.canvas) padFrame.canvas = document.createElement("canvas");
+        var canvas = padFrame.canvas;
+        if (canvas.width !== ew || canvas.height !== eh) {
+          canvas.width = ew;
+          canvas.height = eh;
         }
+        var g = canvas.getContext("2d", { alpha: false });
+        g.fillStyle = currentBg();
+        g.fillRect(0, 0, ew, eh);
+        g.drawImage(source, 0, 0);
+        return canvas;
+      }
+
+      function loadMuxer() {
+        if (loadMuxer.mod) return Promise.resolve(loadMuxer.mod);
+        return import("./vendor/mp4-muxer.mjs").then(function (mod) {
+          loadMuxer.mod = mod;
+          return mod;
+        });
+      }
+
+      function encoderConfig(width, height) {
+        var options = [
+          { codec: "avc1.420028", width: width, height: height, bitrate: 4000000, framerate: 30, avc: { format: "avc" }, hardwareAcceleration: "prefer-hardware" },
+          { codec: "avc1.4d0028", width: width, height: height, bitrate: 4000000, framerate: 30, avc: { format: "avc" }, hardwareAcceleration: "prefer-hardware" },
+          { codec: "avc1.640028", width: width, height: height, bitrate: 4000000, framerate: 30, avc: { format: "avc" }, hardwareAcceleration: "prefer-software" }
+        ];
+        function next(i) {
+          if (i >= options.length) return Promise.reject(new Error("config"));
+          if (typeof VideoEncoder === "undefined" || !VideoEncoder.isConfigSupported) return Promise.resolve(options[0]);
+          return VideoEncoder.isConfigSupported(options[i]).then(function (support) {
+            if (support && support.supported) return options[i];
+            return next(i + 1);
+          }).catch(function () { return next(i + 1); });
+        }
+        return next(0);
+      }
+
+      function encodeClip(images, look, who) {
+        if (typeof VideoEncoder === "undefined" || typeof VideoFrame === "undefined") {
+          return Promise.reject(new Error("encoder"));
+        }
+        var fps = 30;
         var total = bodySeconds(images.length, look) + END;
+        var count = Math.max(1, Math.round(total * fps));
+        var source = look === "cube" ? cubeState.gl : stage;
         drawAt(ctx, images, look, who, 0);
-        var stream = surface.captureStream(30);
-        var rec;
-        try {
-          rec = new MediaRecorder(stream, { mimeType: mime });
-        } catch (err) {
-          fail("recorder");
-          return;
-        }
-        var chunks = [];
-        rec.ondataavailable = function (e) {
-          if (e.data && e.data.size) chunks.push(e.data);
-        };
-        rec.onstop = function () {
-          done(new Blob(chunks, { type: rec.mimeType || mime }));
-        };
-        rec.onerror = function () { fail("error"); };
-        var t0 = performance.now();
-        rec.start(100);
-        function frame(now) {
-          var t = (now - t0) / 1000;
-          drawAt(ctx, images, look, who, Math.min(t, total));
-          if (t < total + 0.12) {
-            requestAnimationFrame(frame);
-            return;
-          }
-          if (rec.state === "recording") rec.stop();
-        }
-        requestAnimationFrame(frame);
+        var surface = padFrame(source);
+        return loadMuxer().then(function (muxLib) {
+          return encoderConfig(surface.width, surface.height).then(function (config) {
+            return new Promise(function (resolve, reject) {
+              var failed = false;
+              function fail(err) {
+                if (failed) return;
+                failed = true;
+                reject(err || new Error("encode"));
+              }
+              var muxer = new muxLib.Muxer({
+                target: new muxLib.ArrayBufferTarget(),
+                video: { codec: "avc", width: surface.width, height: surface.height },
+                fastStart: "in-memory",
+                firstTimestampBehavior: "offset"
+              });
+              var encoder = new VideoEncoder({
+                output: function (chunk, meta) { muxer.addVideoChunk(chunk, meta); },
+                error: function (err) { fail(err); }
+              });
+              try {
+                encoder.configure(config);
+              } catch (err) {
+                fail(err);
+                return;
+              }
+              var i = 0;
+              function pump() {
+                if (failed) return;
+                if (i >= count) {
+                  encoder.flush().then(function () {
+                    muxer.finalize();
+                    resolve(new Blob([muxer.target.buffer], { type: "video/mp4" }));
+                  }).catch(fail);
+                  return;
+                }
+                var t = i / fps;
+                drawAt(ctx, images, look, who, t);
+                surface = padFrame(look === "cube" ? cubeState.gl : stage);
+                var frame;
+                try {
+                  frame = new VideoFrame(surface, { timestamp: Math.round(i * 1000000 / fps) });
+                  encoder.encode(frame, { keyFrame: i % fps === 0 });
+                } catch (err) {
+                  if (frame) frame.close();
+                  fail(err);
+                  return;
+                }
+                frame.close();
+                i += 1;
+                if (i % 15 === 0) setStatus("이 폰에서 만드는 중입니다. " + Math.round(i / count * 100) + "%");
+                if (encoder.encodeQueueSize > 4) {
+                  encoder.addEventListener("dequeue", function onq() {
+                    encoder.removeEventListener("dequeue", onq);
+                    pump();
+                  }, { once: true });
+                  return;
+                }
+                if (i % 8 === 0) requestAnimationFrame(pump);
+                else pump();
+              }
+              pump();
+            });
+          });
+        });
       }
 
       function record(images, look, who) {
+        function failFile() {
+          busy = false;
+          make.disabled = false;
+          setStatus("이 브라우저에서는 영상을 파일로 담지 못합니다.");
+          startPreview();
+        }
         function go() {
-          captureClip(images, look, who, finish, function () {
-            busy = false;
-            make.disabled = false;
-            setStatus("이 브라우저에서는 영상을 파일로 담지 못합니다.");
-            startPreview();
-          });
+          encodeClip(images, look, who).then(finish).catch(failFile);
         }
         if (look !== "cube") {
           go();
@@ -2128,6 +2229,11 @@
         }
         warm();
       }
+
+      mboxMotion.makeFile = function (look, who, images) {
+        var use = images && images.length ? images : (userImages && userImages.length ? userImages : sampleImages);
+        return encodeClip(use, look || "cards", who || "민수에게");
+      };
 
       mboxMotion.pause = function () { tick += 1; };
       mboxMotion.moteReport = function () {
@@ -2240,7 +2346,7 @@
         });
       };
       mboxMotion.usesDrawAt = function () {
-        return String(captureClip).indexOf("drawAt") > 0 && String(paintPreview).indexOf("drawAt") > 0;
+        return String(encodeClip).indexOf("drawAt") > 0 && String(paintPreview).indexOf("drawAt") > 0;
       };
 
       function bootFaces() {
@@ -2262,6 +2368,9 @@
         });
       }
 
+      playerVideo.addEventListener("loadedmetadata", applyClipRate);
+      playerVideo.addEventListener("play", applyClipRate);
+
       var n;
       for (n = 0; n < looks.length; n += 1) {
         looks[n].addEventListener("change", function () {
@@ -2277,16 +2386,20 @@
         });
       }
       photos.addEventListener("change", function () {
-        var files = Array.prototype.slice.call(photos.files || []).slice(0, 6);
-        document.getElementById("picked").textContent = files.length ? ("사진 " + files.length + "장") : "";
+        var all = Array.prototype.slice.call(photos.files || []);
+        var files = all.slice(0, 6);
+        var extra = all.length > 6 ? " 여섯 장까지만 넣습니다." : "";
+        document.getElementById("picked").textContent = files.length ? ("사진 " + files.length + "장." + extra) : "";
         if (!files.length) {
           userImages = null;
           return;
         }
         Promise.all(files.map(loadPhoto)).then(function (images) {
           userImages = images;
+          setStatus("");
         }).catch(function () {
-          setStatus("사진을 읽지 못했습니다.");
+          userImages = null;
+          setStatus("사진을 읽지 못했습니다. JPEG로 골라 주세요.");
         });
       });
       make.addEventListener("click", function () {
