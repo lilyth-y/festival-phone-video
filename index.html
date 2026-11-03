@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ko">
 <head>
+  <!-- festival-sync-20261103f: MediaRecorder + mp4-muxer -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#F5F3EE">
@@ -1318,7 +1319,7 @@
       if (cubePromise) return cubePromise;
       cubePromise = new Promise(function (resolve, reject) {
         var script = document.createElement("script");
-        script.src = "vendor/babylon.js";
+        script.src = "vendor/babylon.js?v=20261103f";
         script.onload = function () { resolve(window.BABYLON); };
         script.onerror = function () { cubeFailed = true; reject(new Error("babylon")); };
         document.head.appendChild(script);
@@ -2139,6 +2140,61 @@
         startPreview();
       }
 
+      /* Festival sync 2026-11-03: MediaRecorder path from gomgomi/web/festival-phone.html */
+      function mimeType(canvas) {
+        var types = [
+          "video/mp4;codecs=avc1.42E01E",
+          "video/mp4",
+          "video/webm;codecs=vp8",
+          "video/webm"
+        ];
+        if (typeof MediaRecorder === "undefined" || !canvas || !canvas.captureStream) return "";
+        var i;
+        for (i = 0; i < types.length; i += 1) {
+          if (MediaRecorder.isTypeSupported(types[i])) return types[i];
+        }
+        return "";
+      }
+
+      function captureClip(images, look, who, done, fail) {
+        var surface = look === "cube" ? (cubeState && cubeState.gl) : stage;
+        var mime = mimeType(surface);
+        if (!mime) {
+          fail("mime");
+          return;
+        }
+        var total = bodySeconds(images.length, look) + END;
+        drawAt(ctx, images, look, who, 0);
+        var stream = surface.captureStream(30);
+        var rec;
+        try {
+          rec = new MediaRecorder(stream, { mimeType: mime });
+        } catch (err) {
+          fail("recorder");
+          return;
+        }
+        var chunks = [];
+        rec.ondataavailable = function (e) {
+          if (e.data && e.data.size) chunks.push(e.data);
+        };
+        rec.onstop = function () {
+          done(new Blob(chunks, { type: rec.mimeType || mime }));
+        };
+        rec.onerror = function () { fail("error"); };
+        var t0 = performance.now();
+        rec.start(100);
+        function frame(now) {
+          var t = (now - t0) / 1000;
+          drawAt(ctx, images, look, who, Math.min(t, total));
+          if (t < total + 0.12) {
+            requestAnimationFrame(frame);
+            return;
+          }
+          if (rec.state === "recording") rec.stop();
+        }
+        requestAnimationFrame(frame);
+      }
+
       function padFrame(source) {
         var w = source.width || W;
         var h = source.height || H;
@@ -2160,7 +2216,7 @@
 
       function loadMuxer() {
         if (loadMuxer.mod) return Promise.resolve(loadMuxer.mod);
-        return import("./vendor/mp4-muxer.mjs").then(function (mod) {
+        return import("./vendor/mp4-muxer.mjs?v=20261103f").then(function (mod) {
           loadMuxer.mod = mod;
           return mod;
         });
@@ -2267,6 +2323,13 @@
           startPreview();
         }
         function go() {
+          var surface = look === "cube" ? (cubeState && cubeState.gl) : stage;
+          if (mimeType(surface)) {
+            captureClip(images, look, who, finish, function () {
+              encodeClip(images, look, who).then(finish).catch(failFile);
+            });
+            return;
+          }
           encodeClip(images, look, who).then(finish).catch(failFile);
         }
         if (look !== "cube") {
@@ -2285,7 +2348,18 @@
 
       mboxMotion.makeFile = function (look, who, images) {
         var use = images && images.length ? images : (userImages && userImages.length ? userImages : sampleImages);
-        return encodeClip(use, look || "cards", who || "민수에게");
+        var lookId = look || "cards";
+        var whoText = who || "민수에게";
+        return new Promise(function (resolve, reject) {
+          var surface = lookId === "cube" ? (cubeState && cubeState.gl) : stage;
+          if (mimeType(surface)) {
+            captureClip(use, lookId, whoText, resolve, function () {
+              encodeClip(use, lookId, whoText).then(resolve).catch(reject);
+            });
+            return;
+          }
+          encodeClip(use, lookId, whoText).then(resolve).catch(reject);
+        });
       };
 
       mboxMotion.pause = function () { tick += 1; };
@@ -2403,7 +2477,7 @@
       };
 
       function bootFaces() {
-        var sources = ["template-previews/face-a.jpg", "template-previews/face-b.jpg", "template-previews/face-c.jpg"];
+        var sources = ["template-previews/face-a.jpg?v=20261103f", "template-previews/face-b.jpg?v=20261103f", "template-previews/face-c.jpg?v=20261103f"];
         return Promise.all(sources.map(function (src) {
           return new Promise(function (resolve, reject) {
             var img = new Image();
